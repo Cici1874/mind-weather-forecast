@@ -1,0 +1,21 @@
+{
+  "name": "脑子天气预报",
+  "short_name": "脑子天气",
+  "description": "每天30秒，观察你的大脑在干什么",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F5F0EB",
+  "theme_color": "#F5F0EB",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
