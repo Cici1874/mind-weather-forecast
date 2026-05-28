@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🏸 脑子天气预报</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="脑子天气">
+<meta name="theme-color" content="#F5F0EB">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600;700;900&family=ZCOOL+KuaiLe&display=swap');
+
+:root {
+  --bg: #F5F0EB;
+  --bg2: #EDE7E0;
+  --card: #FFFFFF;
+  --border: #E0D8CE;
+  --border-light: #EAE4DC;
+
+  --blue: #1A3BC2;
+  --blue-dim: rgba(26,59,194,0.10);
+  --blue-light: #3D5BD6;
+
+  --red: #E8553A;
+  --red-dim: rgba(232,85,58,0.10);
+
+  --yellow: #F2C94C;
+  --yellow-dim: rgba(242,201,76,0.15);
+
+  --charcoal: #2B2B2B;
+
+  /* dimension accents — saturated to match this bold palette */
+  --acc-mint: #1A8A5C;
+  --acc-mint-dim: rgba(26,138,92,0.10);
+  --acc-coral: #E8553A;
+  --acc-coral-dim: rgba(232,85,58,0.10);
+  --acc-lavender: #6B5BAE;
+  --acc-lavender-dim: rgba(107,91,174,0.10);
+  --acc-sky: #1A3BC2;
+  --acc-sky-dim: rgba(26,59,194,0.10);
+  --acc-amber: #D4960A;
+  --acc-amber-dim: rgba(212,150,10,0.10);
+  --acc-peach: #C46A2A;
+  --acc-peach-dim: rgba(196,106,42,0.10);
+  --acc-violet: #7B4BAE;
+  --acc-violet-dim: rgba(123,75,174,0.10);
+  --acc-yellow: #B8940A;
+  --acc-yellow-dim: rgba(184,148,10,0.12);
+
+  --text: #2B2B2B;
+  --text2: #4A4A4A;
+  --dim: #7A7268;
+  --dimmer: #A89E94;
+  --white: #FFFFFF;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans SC', sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+#app {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0 0 100px 0;
+  position: relative;
+}
+
+.bg-shuttle {
+  position: fixed; top: 20px; right: 6px;
+  font-size: 72px; opacity: 0.05;
+  transform: rotate(-20deg);
+  pointer-events: none; z-index: 0;
+}
+.bg-shuttle-2 {
+  position: fixed; bottom: 100px; left: -8px;
+  font-size: 48px; opacity: 0.04;
+  transform: rotate(35deg);
+  pointer-events: none; z-index: 0;
+}
+/* Bold color blobs */
+.bg-blob { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+.bg-blob-1 {
+  top: -80px; right: -60px;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(26,59,194,0.06) 0%, transparent 70%);
+}
+.bg-blob-2 {
+  bottom: -50px; left: -50px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(232,85,58,0.05) 0%, transparent 70%);
+}
+
+/* ===== Header ===== */
+.header {
+  text-align: center;
+  padding: 40px 20px 14px;
+  position: relative; z-index: 1;
+}
+.header-shuttle {
+  width: 48px; height: 48px;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0) rotate(-6deg); }
+  50% { transform: translateY(-6px) rotate(6deg); }
+}
+.header h1 {
+  font-family: 'ZCOOL KuaiLe', cursive;
+  font-size: 24px;
+  color: var(--blue);
+  margin-top: 6px;
+  letter-spacing: 2px;
+}
+.header .sub {
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 6px;
+}
+
+/* ===== Philosophy card ===== */
+.philo-card {
+  margin: 0 16px 14px;
+  padding: 14px 18px 14px 22px;
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  position: relative; z-index: 1;
+  box-shadow: 0 2px 10px rgba(43,43,43,0.05);
+  overflow: hidden;
+}
+.philo-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: linear-gradient(to bottom, var(--blue), var(--red));
+  border-radius: 4px 0 0 4px;
+}
+.philo-text {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+.philo-source {
+  font-size: 11px;
+  color: var(--dimmer);
+  margin-top: 6px;
+  text-align: right;
+}
+
+/* ===== Date bar ===== */
+.date-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 20px; margin-bottom: 14px;
+  position: relative; z-index: 1;
+}
+.date-text { font-size: 13px; color: var(--dim); }
+.streak-pill {
+  font-size: 11px; font-weight: 600;
+  color: var(--red);
+  background: var(--red-dim);
+  padding: 4px 12px; border-radius: 20px;
+  display: flex; align-items: center; gap: 4px;
+  border: 1px solid rgba(232,85,58,0.18);
+}
+
+/* ===== Content ===== */
+.content { padding: 0 16px; position: relative; z-index: 1; }
+
+/* ===== Question cards ===== */
+.q-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border-light);
+  transition: all 0.25s;
+  box-shadow: 0 1px 6px rgba(43,43,43,0.04);
+}
+.q-card.answered {
+  border-color: var(--blue);
+  box-shadow: 0 2px 12px rgba(26,59,194,0.1);
+}
+.q-label {
+  font-size: 13px; font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.q-label .icon { font-size: 16px; }
+.q-label .abstract {
+  font-size: 11px; color: var(--dimmer); font-weight: 400;
+  margin-left: auto;
+  background: var(--bg2);
+  padding: 2px 8px; border-radius: 8px;
+}
+
+.options { display: flex; gap: 6px; flex-wrap: wrap; }
+.opt {
+  flex: 1 1 0; min-width: 0;
+  padding: 10px 4px; border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--dim); font-size: 12px;
+  font-family: inherit; cursor: pointer;
+  text-align: center; transition: all 0.15s;
+  line-height: 1.3;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+}
+.opt:active { transform: scale(0.94); }
+.opt .opt-emoji { font-size: 20px; }
+.opt .opt-text { font-size: 11px; }
+
+.opt-mint.sel { background: var(--acc-mint-dim); border-color: var(--acc-mint); color: var(--acc-mint); font-weight: 600; }
+.opt-coral.sel { background: var(--acc-coral-dim); border-color: var(--acc-coral); color: var(--acc-coral); font-weight: 600; }
+.opt-lavender.sel { background: var(--acc-lavender-dim); border-color: var(--acc-lavender); color: var(--acc-lavender); font-weight: 600; }
+.opt-sky.sel { background: var(--acc-sky-dim); border-color: var(--acc-sky); color: var(--acc-sky); font-weight: 600; }
+.opt-amber.sel { background: var(--acc-amber-dim); border-color: var(--acc-amber); color: var(--acc-amber); font-weight: 600; }
+.opt-peach.sel { background: var(--acc-peach-dim); border-color: var(--acc-peach); color: var(--acc-peach); font-weight: 600; }
+.opt-violet.sel { background: var(--acc-violet-dim); border-color: var(--acc-violet); color: var(--acc-violet); font-weight: 600; }
+.opt-yellow.sel { background: var(--acc-yellow-dim); border-color: var(--acc-yellow); color: var(--acc-yellow); font-weight: 600; }
+
+/* ===== Note ===== */
+.note-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 1px 6px rgba(43,43,43,0.04);
+}
+.note-card textarea {
+  width: 100%; background: transparent;
+  border: none; color: var(--text);
+  font-size: 13px; font-family: inherit;
+  resize: none; outline: none;
+  min-height: 40px; line-height: 1.6;
+}
+.note-card textarea::placeholder { color: var(--dimmer); }
+
+/* ===== Submit ===== */
+.submit-wrap { margin: 20px 0; text-align: center; }
+.btn-submit {
+  width: 100%; padding: 15px;
+  border-radius: 16px; border: none;
+  font-family: 'ZCOOL KuaiLe', cursive;
+  font-size: 17px; cursor: pointer;
+  transition: all 0.2s; letter-spacing: 1px;
+}
+.btn-submit.ready {
+  background: var(--blue);
+  color: var(--white);
+  box-shadow: 0 4px 18px rgba(26,59,194,0.3);
+}
+.btn-submit.ready:active { transform: scale(0.97); box-shadow: 0 2px 8px rgba(26,59,194,0.2); }
+.btn-submit.not-ready {
+  background: var(--bg2);
+  color: var(--dimmer);
+  border: 1.5px dashed var(--border);
+}
+
+/* ===== Done state ===== */
+.done-card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 36px 24px;
+  text-align: center;
+  border: 1.5px solid var(--blue);
+  margin-bottom: 16px;
+  box-shadow: 0 4px 24px rgba(26,59,194,0.1);
+  position: relative; overflow: hidden;
+}
+.done-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--blue), var(--red), var(--yellow));
+}
+.done-shuttle { font-size: 52px; display: inline-block; animation: smash 2s ease-in-out infinite; }
+@keyframes smash {
+  0%,100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-12deg) scale(1.08); }
+  50% { transform: rotate(5deg) scale(1); }
+}
+.done-title {
+  font-family: 'ZCOOL KuaiLe', cursive;
+  font-size: 22px; color: var(--blue);
+  margin-top: 12px;
+}
+.done-sub {
+  font-size: 13px; color: var(--dim);
+  margin-top: 10px; line-height: 1.6;
+}
+.done-abstract {
+  font-size: 12px; color: var(--dimmer);
+  margin-top: 14px; font-style: italic;
+  background: var(--bg2);
+  display: inline-block;
+  padding: 6px 14px; border-radius: 10px;
+}
+
+/* ===== Nav ===== */
+.nav-bar {
+  position: fixed; bottom: 0;
+  left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 420px;
+  display: flex;
+  background: var(--card);
+  border-top: 1px solid var(--border-light);
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -2px 12px rgba(43,43,43,0.05);
+}
+.nav-tab {
+  flex: 1; padding: 10px 0 8px;
+  text-align: center; cursor: pointer;
+  border: none; background: transparent;
+  font-family: inherit;
+  color: var(--dimmer); font-size: 11px;
+  transition: color 0.2s;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+}
+.nav-tab .nav-icon { font-size: 18px; }
+.nav-tab.active { color: var(--blue); font-weight: 600; }
+
+/* ===== Report ===== */
+.report-dim-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-light);
+  margin-bottom: 10px;
+  box-shadow: 0 1px 6px rgba(43,43,43,0.04);
+}
+.report-dim-label {
+  font-size: 12px; color: var(--dim); font-weight: 600;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.report-bars { display: flex; gap: 4px; align-items: flex-end; height: 44px; }
+.report-bar { flex: 1; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s; }
+.report-bar-labels { display: flex; gap: 4px; margin-top: 4px; }
+.report-bar-label { flex: 1; font-size: 9px; color: var(--dimmer); text-align: center; }
+.report-summary {
+  font-size: 12px; color: var(--dim);
+  line-height: 1.6; margin-top: 8px;
+  background: var(--bg2);
+  padding: 8px 10px; border-radius: 8px;
+}
+.report-for-doc {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 18px;
+  border: 2px solid var(--blue);
+  margin-top: 20px;
+  box-shadow: 0 4px 18px rgba(26,59,194,0.1);
+}
+.report-for-doc-title {
+  font-size: 14px; font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 10px;
+}
+.report-for-doc-text {
+  font-size: 12px; color: var(--text);
+  line-height: 1.8; white-space: pre-wrap;
+}
+.btn-copy {
+  margin-top: 14px;
+  padding: 12px 20px;
+  border-radius: 12px; border: none;
+  background: var(--blue);
+  color: var(--white);
+  font-size: 13px; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(26,59,194,0.2);
+}
+.btn-copy:active { transform: scale(0.97); }
+
+/* ===== History ===== */
+.history-item {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-light);
+  margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(43,43,43,0.04);
+}
+.history-date { font-size: 12px; color: var(--dim); margin-bottom: 8px; font-weight: 600; }
+.history-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.history-chip {
+  font-size: 11px; padding: 3px 9px;
+  border-radius: 8px;
+  background: var(--blue-dim); color: var(--blue);
+}
+.history-chip.warn { background: var(--red-dim); color: var(--red); }
+.history-chip.mid { background: var(--yellow-dim); color: var(--acc-yellow); }
+.history-note {
+  font-size: 11px; color: var(--dimmer);
+  margin-top: 8px; font-style: italic;
+  padding-left: 4px;
+  border-left: 2px solid var(--border);
+}
+
+/* ===== Settings ===== */
+.setting-row {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-light);
+  margin-bottom: 8px;
+  display: flex; justify-content: space-between;
+  align-items: center;
+}
+.setting-label { font-size: 13px; color: var(--text); }
+.setting-action {
+  padding: 7px 16px; border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  font-size: 12px; font-family: inherit;
+  cursor: pointer; font-weight: 600;
+  transition: all 0.15s;
+}
+.setting-action:active { transform: scale(0.95); }
+.setting-export { color: var(--blue); border-color: var(--blue); }
+.setting-danger { color: var(--red); border-color: var(--red); }
+
+.instruction-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-light);
+  margin-top: 16px;
+}
+.instruction-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+.instruction-steps {
+  font-size: 12px; color: var(--dim);
+  line-height: 1.8;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--dimmer);
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+/* ===== Answered card arc decoration ===== */
+.q-card.answered { position: relative; }
+.q-card.answered::after {
+  content: '';
+  position: absolute;
+  top: 8px; right: 12px;
+  width: 24px; height: 12px;
+  border: 2px solid var(--blue);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  opacity: 0.2;
+}
+
+/* ===== Shuttle streak badge ===== */
+.streak-badge {
+  font-size: 11px; font-weight: 600;
+  color: var(--red);
+  background: var(--red-dim);
+  padding: 4px 10px 4px 6px;
+  border-radius: 12px 20px 20px 12px;
+  display: flex; align-items: center; gap: 4px;
+  border: 1px solid rgba(232,85,58,0.18);
+  position: relative;
+}
+.streak-badge::before {
+  content: '🏸';
+  font-size: 13px;
+}
+
+/* ===== Net divider for report ===== */
+.net-divider {
+  height: 16px;
+  margin: 14px 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.net-divider::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--border);
+}
+.net-divider::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 8px,
+    var(--border) 8px,
+    var(--border) 9px
+  );
+  transform: translateY(-50%);
+  opacity: 0.5;
+}
+.net-label {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  padding: 0 10px;
+  margin: 0 auto;
+  font-size: 10px;
+  color: var(--dimmer);
+  white-space: nowrap;
+}
+
+/* ===== Smash trajectory on toast ===== */
+.toast-trajectory {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 20px;
+}
+.toast-trajectory::before {
+  content: '🏸';
+  position: absolute;
+  font-size: 20px;
+  animation: smashFly 0.8s ease-out forwards;
+  opacity: 0;
+}
+@keyframes smashFly {
+  0% { top: 80%; left: -10%; opacity: 0.8; transform: rotate(0deg); }
+  60% { top: 20%; left: 70%; opacity: 0.6; transform: rotate(180deg); }
+  100% { top: -20%; left: 110%; opacity: 0; transform: rotate(360deg); }
+}
+.toast-trajectory::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 10%;
+  width: 80%; height: 40%;
+  border: 2px dashed rgba(26,59,194,0.1);
+  border-radius: 0 80% 0 0;
+  border-bottom: none; border-left: none;
+  animation: arcFade 0.8s ease-out forwards;
+  transform: translateY(-100%);
+}
+@keyframes arcFade {
+  0% { opacity: 0; } 30% { opacity: 0.4; } 100% { opacity: 0; }
+}
+
+/* ===== Abstract loading shimmer on options ===== */
+.opt:not(.sel)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(90deg, transparent 30%, rgba(26,59,194,0.03) 50%, transparent 70%);
+  background-size: 200% 100%;
+  opacity: 0;
+}
+.opt { position: relative; overflow: hidden; }
+
+/* ===== Shuttle trail on page transitions ===== */
+.shuttle-trail {
+  position: fixed;
+  top: 50%; left: -30px;
+  font-size: 24px;
+  z-index: 150;
+  pointer-events: none;
+  animation: trailFly 0.5s ease-out forwards;
+}
+@keyframes trailFly {
+  0% { left: -30px; top: 60%; opacity: 0.7; transform: rotate(-30deg); }
+  100% { left: 110%; top: 30%; opacity: 0; transform: rotate(15deg); }
+}
+
+/* ===== Random rotation for bg shuttles ===== */
+.bg-shuttle { animation: bgDrift 20s ease-in-out infinite; }
+@keyframes bgDrift {
+  0%,100% { transform: rotate(-20deg) translateY(0); }
+  50% { transform: rotate(-15deg) translateY(10px); }
+}
+
+.fade-in { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.toast-overlay { position:fixed; inset:0; background:rgba(43,43,43,0.15); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:199; }
+.toast {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--card);
+  border: 2px solid var(--blue);
+  border-radius: 20px;
+  padding: 28px 36px; text-align: center;
+  z-index: 200; animation: toastIn 0.3s ease;
+  box-shadow: 0 20px 60px rgba(43,43,43,0.18);
+  position: relative; overflow: hidden;
+}
+@keyframes toastIn { from { opacity:0; transform:translate(-50%,-50%) scale(0.9); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+.toast-icon { font-size: 44px; position: relative; z-index: 1; }
+.toast-text { font-size: 15px; color: var(--text); margin-top: 10px; font-weight: 600; position: relative; z-index: 1; }
+.toast-sub { font-size: 12px; color: var(--dim); margin-top: 6px; line-height: 1.5; position: relative; z-index: 1; }
+/* ===== iPad / Tablet adaptation ===== */
+@media (min-width: 768px) {
+  #app {
+    max-width: 720px;
+    padding-bottom: 120px;
+  }
+
+  /* Header */
+  .header { padding: 56px 32px 24px; }
+  .header-shuttle { width: 72px; height: 72px; }
+  .header-shuttle svg { width: 72px; height: 72px; }
+  .header h1 { font-size: 36px; margin-top: 12px; letter-spacing: 3px; }
+  .header .sub { font-size: 17px; margin-top: 10px; }
+
+  /* Philosophy card */
+  .philo-card { margin: 0 24px 20px; padding: 20px 26px 20px 30px; border-radius: 20px; }
+  .philo-card::after { width: 5px; }
+  .philo-text { font-size: 18px; line-height: 1.8; }
+  .philo-source { font-size: 15px; margin-top: 8px; }
+
+  /* Date bar */
+  .date-bar { padding: 0 28px; margin-bottom: 20px; }
+  .date-text { font-size: 17px; }
+  .streak-badge { font-size: 15px; padding: 6px 16px 6px 10px; border-radius: 14px 24px 24px 14px; }
+  .streak-badge::before { font-size: 18px; }
+
+  /* Content */
+  .content { padding: 0 24px; }
+
+  /* Question cards */
+  .q-card { padding: 22px 24px; margin-bottom: 14px; border-radius: 20px; }
+  .q-label { font-size: 18px; margin-bottom: 14px; gap: 10px; }
+  .q-label .icon { font-size: 22px; }
+  .q-label .abstract { font-size: 14px; padding: 3px 12px; border-radius: 10px; }
+
+  .options { gap: 10px; }
+  .opt { padding: 14px 8px; border-radius: 14px; border-width: 2px; gap: 6px; }
+  .opt .opt-emoji { font-size: 28px; }
+  .opt .opt-text { font-size: 15px; }
+
+  /* Answered arc */
+  .q-card.answered::after { width: 32px; height: 16px; top: 12px; right: 16px; border-width: 3px; }
+
+  /* Note */
+  .note-card { padding: 22px 24px; border-radius: 20px; }
+  .note-card textarea { font-size: 17px; min-height: 56px; }
+
+  /* Submit */
+  .submit-wrap { margin: 28px 0; }
+  .btn-submit { padding: 20px; border-radius: 20px; font-size: 22px; }
+
+  /* Done card */
+  .done-card { padding: 48px 36px; border-radius: 24px; }
+  .done-shuttle { font-size: 72px; }
+  .done-title { font-size: 30px; margin-top: 16px; }
+  .done-sub { font-size: 18px; margin-top: 14px; }
+  .done-abstract { font-size: 16px; margin-top: 18px; padding: 10px 20px; border-radius: 14px; }
+
+  /* Nav bar */
+  .nav-bar { max-width: 720px; padding-bottom: env(safe-area-inset-bottom, 8px); }
+  .nav-tab { padding: 14px 0 10px; font-size: 14px; gap: 4px; }
+  .nav-tab .nav-icon { font-size: 24px; }
+
+  /* Report */
+  .report-dim-card { padding: 20px 22px; border-radius: 18px; margin-bottom: 14px; }
+  .report-dim-label { font-size: 16px; gap: 8px; margin-bottom: 12px; }
+  .report-bars { height: 56px; gap: 6px; }
+  .report-bar { border-radius: 5px 5px 0 0; }
+  .report-bar-labels { gap: 6px; margin-top: 6px; }
+  .report-bar-label { font-size: 12px; }
+  .report-summary { font-size: 16px; margin-top: 10px; padding: 12px 14px; border-radius: 10px; }
+  .report-for-doc { padding: 24px; border-radius: 20px; border-width: 2.5px; }
+  .report-for-doc-title { font-size: 18px; margin-bottom: 14px; }
+  .report-for-doc-text { font-size: 15px; line-height: 1.9; }
+  .btn-copy { padding: 16px 24px; border-radius: 14px; font-size: 17px; }
+
+  /* History */
+  .history-item { padding: 18px 22px; border-radius: 18px; margin-bottom: 12px; }
+  .history-date { font-size: 15px; margin-bottom: 10px; }
+  .history-chips { gap: 8px; }
+  .history-chip { font-size: 14px; padding: 5px 12px; border-radius: 10px; }
+  .history-note { font-size: 14px; margin-top: 10px; padding-left: 8px; }
+
+  /* Settings */
+  .setting-row { padding: 18px 22px; border-radius: 18px; margin-bottom: 12px; }
+  .setting-label { font-size: 17px; }
+  .setting-action { padding: 10px 22px; border-radius: 12px; font-size: 15px; }
+  .instruction-card { padding: 22px 24px; border-radius: 18px; margin-top: 20px; }
+  .instruction-title { font-size: 17px; margin-bottom: 12px; }
+  .instruction-steps { font-size: 16px; line-height: 1.9; }
+
+  .empty-state { padding: 56px 28px; font-size: 17px; line-height: 2; }
+
+  /* Net divider */
+  .net-divider { height: 24px; margin: 20px 0; }
+  .net-label { font-size: 13px; padding: 0 14px; }
+
+  /* Toast */
+  .toast { padding: 40px 52px; border-radius: 24px; }
+  .toast-icon { font-size: 60px; }
+  .toast-text { font-size: 20px; margin-top: 14px; }
+  .toast-sub { font-size: 16px; margin-top: 8px; }
+
+  /* BG decorations scale up */
+  .bg-shuttle { font-size: 100px; top: 30px; right: 12px; }
+  .bg-shuttle-2 { font-size: 70px; }
+  .bg-blob-1 { width: 360px; height: 360px; }
+  .bg-blob-2 { width: 300px; height: 300px; }
+}
+
+/* Extra wide landscape iPad */
+@media (min-width: 1024px) {
+  #app { max-width: 800px; }
+  .nav-bar { max-width: 800px; }
+}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(function(){
+'use strict';
+
+const SHUTTLE_SVG = `<svg viewBox="0 0 64 64" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="32" cy="20" rx="11" ry="14" fill="#FFFFFF" stroke="#1A3BC2" stroke-width="1.4"/>
+  <ellipse cx="32" cy="18" rx="7" ry="9" fill="#F5F0EB" opacity="0.6"/>
+  <line x1="24" y1="33" x2="18" y2="52" stroke="#1A3BC2" stroke-width="2" stroke-linecap="round"/>
+  <line x1="28" y1="33" x2="26" y2="54" stroke="#1A3BC2" stroke-width="2" stroke-linecap="round"/>
+  <line x1="36" y1="33" x2="38" y2="54" stroke="#1A3BC2" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="33" x2="46" y2="52" stroke="#1A3BC2" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="14" r="2.5" fill="#E8553A" opacity="0.8"/>
+</svg>`;
+
+const QUOTES = [
+  { text: "未经审视的人生不值得过。", src: "苏格拉底" },
+  { text: "他人即地狱——但也可以是镜子。", src: "萨特（改）" },
+  { text: "人是一根会思想的芦苇。脆弱，但很厉害。", src: "帕斯卡" },
+  { text: "世界上只有一种英雄主义：看清生活之后，依然热爱它。", src: "罗曼·罗兰" },
+  { text: "凡是不能杀死你的，都会让你去挂骨科。", src: "尼采（大概）" },
+  { text: "存在先于本质——你先活着，再慢慢定义自己。", src: "萨特" },
+  { text: "我思故我在。但有时候不思也在，比如发呆的时候。", src: "笛卡尔（改）" },
+  { text: "人不能两次踏入同一条河流。但可以两次踩进同一个坑。", src: "赫拉克利特（改）" },
+  { text: "知道自己不知道，就已经很知道了。", src: "苏格拉底" },
+  { text: "自由不是想做什么就做什么，而是不想做什么就能不做什么。", src: "康德" },
+  { text: "幸福不是一个终点，是一种活法。", src: "亚里士多德" },
+  { text: "万物皆流，没有什么是永恒的——包括你现在的心情。", src: "赫拉克利特" },
+  { text: "人生苦短，及时吃鸡腿。", src: "伊壁鸠鲁（大意）" },
+  { text: "如果你觉得教育贵，试试无知的价格。", src: "苏格拉底（改）" },
+  { text: "人可以被毁灭，但不能被打败。除了被闹钟打败。", src: "海明威+现实" },
+  { text: "每个人都是自己那片荒原上的国王。", src: "尼采" },
+  { text: "当你凝视深渊时，深渊也在凝视你。所以赶紧把手机亮度调低。", src: "尼采（改）" },
+  { text: "认识你自己。这需要一辈子，不着急。", src: "德尔菲神谕" },
+  { text: "我唯一知道的就是我一无所知。但这也算知道了一件事。", src: "苏格拉底" },
+  { text: "温柔地走入那个良夜？不，先把作业写完。", src: "狄兰·托马斯（改）" },
+  { text: "人生没有意义，除非你自己给它一个。这既恐怖又自由。", src: "加缪" },
+  { text: "吾日三省吾身——省完该干嘛干嘛。", src: "曾子（改）" },
+  { text: "如果一棵树倒在森林里没人听到，它还是倒了。你不记作业不代表没作业。", src: "贝克莱（改）" },
+  { text: "生活就像骑自行车，要保持平衡就得不停地往前。", src: "爱因斯坦" },
+  { text: "痛苦是不可避免的，但受苦是可以选择的。大部分时候。", src: "佛陀（改）" },
+  { text: "快乐的秘诀不是做自己喜欢的事，而是喜欢自己正在做的事。", src: "斯宾诺莎" },
+  { text: "世界是我的表象——但别人的世界也是别人的表象。", src: "叔本华" },
+  { text: "勇气不是不害怕，而是害怕了还往前走。走两步也算。", src: "亚里士多德（改）" },
+  { text: "真正的智慧是知道自己的无知有多深。深到能游泳那种。", src: "苏格拉底（改）" },
+  { text: "逻辑能把你从A带到B，想象力能带你去任何地方。", src: "爱因斯坦" },
+];
+
+const ABSTRACT_DONE = [
+  "今日大脑气象数据已归档。你的脑子表示感谢被关注。",
+  "记录完毕。你的神经递质已被通知。",
+  "打卡成功。一只羽毛球从你的脑海划过以示庆祝。",
+  "今天的大脑天气报告已存入宇宙档案馆。",
+  "记录完成。你的前额叶皮层给你点了个赞。",
+  "数据已收录。多巴胺表示它会努力的（大概）。",
+  "今日观察结束。你的海马体说辛苦了。",
+  "登记成功。你的注意力表示虽然经常不在，但一直爱你。",
+  "已记录。你的杏仁核刚才偷偷鼓了个掌。",
+  "打卡完成。这条记录正以光速飞向你未来的医生。",
+  "你的大脑今天被正式观测了。薛定谔表示波函数已坍缩。",
+  "记录归档。你的小脑说它虽然不管这些，但也替你开心。",
+  "成功！一个平行宇宙的你也刚刚打完卡。大概。",
+  "数据已保存。你的前扣带回皮层发来贺电。",
+];
+
+const STREAK_MSGS = [
+  "",
+  "第一天！发球权在你手上。",
+  "连续2天。一来一回，rally开始了。",
+  "3天！习惯正在形成。你的大脑已被列入观测名单。",
+  "4天。你的坚持程度已超过78%的成年人（数据来源：我编的）。",
+  "5天！工作日全勤。你的多巴胺申请加班费。",
+  "6天了。这些数据到时候会很有用的。",
+  "一整周！🏸 21:0 完胜拖延症。",
+];
+
+const QUESTIONS = [
+  { id:'attention', icon:'🎯', label:'今天脑子飘了多少', abstract:'注意力天气', color:'mint',
+    options:[ {emoji:'🏸',text:'稳如老狗',val:0},{emoji:'🪁',text:'偶尔飘一下',val:1},{emoji:'🌪️',text:'半天在神游',val:2},{emoji:'🕳️',text:'人在教室魂在外太空',val:3} ] },
+  { id:'initiation', icon:'🚀', label:'该做的事启动得了吗', abstract:'发动机状况', color:'coral',
+    options:[ {emoji:'⚡',text:'说做就做',val:0},{emoji:'🐌',text:'拖了一会儿',val:1},{emoji:'🪨',text:'坐了很久才动',val:2},{emoji:'🧊',text:'完全冻住了',val:3} ] },
+  { id:'memory', icon:'🧠', label:'今天忘了啥没', abstract:'内存容量', color:'lavender',
+    options:[ {emoji:'✅',text:'都记得',val:0},{emoji:'📦',text:'忘带东西',val:1},{emoji:'💭',text:'忘了别人说的',val:2},{emoji:'🫠',text:'忘了好几样',val:3} ] },
+  { id:'emotion', icon:'🎢', label:'情绪波动', abstract:'内心天气', color:'sky',
+    options:[ {emoji:'😶',text:'平静',val:0},{emoji:'🌊',text:'有点波动',val:1},{emoji:'🎢',text:'过山车',val:2},{emoji:'🌋',text:'火山爆发级',val:3} ] },
+  { id:'time', icon:'⏰', label:'时间感准不准', abstract:'时空扭曲指数', color:'amber',
+    options:[ {emoji:'🎯',text:'挺准',val:0},{emoji:'⏳',text:'偏了一点',val:1},{emoji:'🕳️',text:'以为还早结果完了',val:2} ] },
+  { id:'body', icon:'🦵', label:'坐得住吗', abstract:'物理稳定性', color:'peach',
+    options:[ {emoji:'🧘',text:'很稳',val:0},{emoji:'🦵',text:'抖腿转笔',val:1},{emoji:'🐒',text:'完全坐不住',val:2} ] },
+  { id:'sleep', icon:'🌙', label:'昨晚躺下后脑子跑了多久', abstract:'夜间脑内马拉松', color:'violet',
+    options:[ {emoji:'😴',text:'秒睡',val:0},{emoji:'🐑',text:'跑了一小会儿',val:1},{emoji:'🏃',text:'半小时以上',val:2},{emoji:'🎪',text:'脑内开了演唱会',val:3} ] },
+  { id:'mood', icon:'🏸', label:'总体心情', abstract:'今日比赛结果', color:'yellow',
+    options:[ {emoji:'🌟',text:'很好',val:0},{emoji:'🙂',text:'还行',val:1},{emoji:'😐',text:'一般',val:2},{emoji:'😮‍💨',text:'不太行',val:3},{emoji:'🌧️',text:'很差',val:4} ] },
+];
+
+let records=[],currentTab='checkin',answers={},noteText='',toastData=null;
+
+function getToday(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function getWeekday(ds){return ['周日','周一','周二','周三','周四','周五','周六'][new Date(ds).getDay()];}
+function todayDone(){return records.some(r=>r.date===getToday());}
+function getStreak(){let s=0,d=new Date();if(!todayDone())d.setDate(d.getDate()-1);while(true){const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;if(records.some(r=>r.date===ds)){s++;d.setDate(d.getDate()-1);}else break;}return s;}
+function getDayQuote(){const d=new Date();return QUOTES[(d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate())%QUOTES.length];}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function saveData(){try{localStorage.setItem('brainweather_v4',JSON.stringify(records));}catch(e){}}
+function loadData(){try{const d=localStorage.getItem('brainweather_v4');if(d)records=JSON.parse(d);}catch(e){}}
+
+function h(tag,attrs,...ch){
+  const el=document.createElement(tag);
+  if(attrs)Object.entries(attrs).forEach(([k,v])=>{
+    if(k==='className')el.className=v;
+    else if(k==='style'&&typeof v==='object')Object.assign(el.style,v);
+    else if(k.startsWith('on'))el[k]=v;
+    else if(k==='innerHTML')el.innerHTML=v;
+    else el.setAttribute(k,v);
+  });
+  ch.flat(Infinity).forEach(c=>{if(c==null||c===false)return;el.appendChild(typeof c==='string'?document.createTextNode(c):c);});
+  return el;
+}
+
+function render(){
+  const app=document.getElementById('app');app.innerHTML='';
+  app.appendChild(h('div',{className:'bg-shuttle'},'🏸'));
+  app.appendChild(h('div',{className:'bg-shuttle-2'},'🏸'));
+  app.appendChild(h('div',{className:'bg-blob bg-blob-1'}));
+  app.appendChild(h('div',{className:'bg-blob bg-blob-2'}));
+  if(currentTab==='checkin')renderCheckin(app);
+  else if(currentTab==='history')renderHistory(app);
+  else if(currentTab==='report')renderReport(app);
+  else if(currentTab==='settings')renderSettings(app);
+  const nav=h('div',{className:'nav-bar'});
+  [{id:'checkin',icon:'🏸',label:'打卡'},{id:'history',icon:'📋',label:'记录'},{id:'report',icon:'📊',label:'报告'},{id:'settings',icon:'⚙️',label:'设置'}].forEach(t=>{
+    nav.appendChild(h('button',{className:'nav-tab'+(currentTab===t.id?' active':''),onclick:()=>{currentTab=t.id;render();}},h('span',{className:'nav-icon'},t.icon),t.label));
+  });
+  app.appendChild(nav);
+  if(toastData){
+    app.appendChild(h('div',{className:'toast-overlay',onclick:dismissToast}));
+    const toastEl=h('div',{className:'toast',style:{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)'}},h('div',{className:'toast-trajectory'}),h('div',{className:'toast-icon'},toastData.icon),h('div',{className:'toast-text'},toastData.text),toastData.sub?h('div',{className:'toast-sub'},toastData.sub):null);
+    app.appendChild(toastEl);
+  }
+}
+function dismissToast(){toastData=null;render();}
+
+function renderCheckin(app){
+  const hdr=h('div',{className:'header fade-in'});
+  hdr.appendChild(h('div',{className:'header-shuttle',innerHTML:SHUTTLE_SVG}));
+  hdr.appendChild(h('h1',null,'脑子天气预报'));
+  hdr.appendChild(h('div',{className:'sub'},'每天30秒，观察你的大脑在干什么'));
+  app.appendChild(hdr);
+  const q=getDayQuote();
+  app.appendChild(h('div',{className:'philo-card fade-in'},h('div',{className:'philo-text'},q.text),h('div',{className:'philo-source'},'—— '+q.src)));
+  const streak=getStreak();
+  app.appendChild(h('div',{className:'date-bar fade-in'},h('div',{className:'date-text'},getToday()+' '+getWeekday(getToday())),streak>0?h('div',{className:'streak-badge'},`连续${streak}天`):null));
+  const content=h('div',{className:'content'});
+  if(todayDone()){
+    const absMsg=ABSTRACT_DONE[Math.floor(Math.random()*ABSTRACT_DONE.length)];
+    const sm=streak<=7?(STREAK_MSGS[streak]||`连续${streak}天了！`):`连续${streak}天！你比大部分成年人都能坚持。`;
+    content.appendChild(h('div',{className:'done-card fade-in'},h('div',{className:'done-shuttle'},'🏸'),h('div',{className:'done-title'},'今天已经记录过啦'),h('div',{className:'done-sub'},sm),h('div',{className:'done-abstract'},absMsg)));
+  } else {
+    QUESTIONS.forEach((q,qi)=>{
+      const card=h('div',{className:'q-card fade-in'+(answers[q.id]!==undefined?' answered':''),style:{animationDelay:(qi*0.04)+'s'}});
+      card.appendChild(h('div',{className:'q-label'},h('span',{className:'icon'},q.icon),q.label,h('span',{className:'abstract'},q.abstract)));
+      const optRow=h('div',{className:'options'});
+      q.options.forEach(o=>{optRow.appendChild(h('button',{className:'opt opt-'+q.color+(answers[q.id]===o.val?' sel':''),onclick:()=>{answers[q.id]=o.val;render();}},h('span',{className:'opt-emoji'},o.emoji),h('span',{className:'opt-text'},o.text)));});
+      card.appendChild(optRow);content.appendChild(card);
+    });
+    const noteCard=h('div',{className:'note-card fade-in'});
+    noteCard.appendChild(h('div',{className:'q-label'},h('span',{className:'icon'},'✏️'),'备注',h('span',{className:'abstract'},'选填')));
+    const ta=h('textarea',{placeholder:'今天发生了什么值得一记的事？不写也完全没问题。',rows:'2',oninput:e=>{noteText=e.target.value;}});ta.value=noteText;
+    noteCard.appendChild(ta);content.appendChild(noteCard);
+    const allA=QUESTIONS.every(q=>answers[q.id]!==undefined);
+    content.appendChild(h('div',{className:'submit-wrap fade-in'},h('button',{className:'btn-submit '+(allA?'ready':'not-ready'),onclick:allA?submitCheckin:null},allA?'🏸 发球！记录今天':`还有 ${QUESTIONS.filter(q=>answers[q.id]===undefined).length} 项没选`)));
+  }
+  app.appendChild(content);
+}
+
+function submitCheckin(){
+  records.push({id:uid(),date:getToday(),ts:Date.now(),answers:{...answers},note:noteText.trim()||''});
+  saveData();
+  toastData={icon:'🏸',text:'记录成功！',sub:ABSTRACT_DONE[Math.floor(Math.random()*ABSTRACT_DONE.length)]};
+  answers={};noteText='';render();setTimeout(dismissToast,2500);
+}
+
+function renderHistory(app){
+  app.appendChild(h('div',{className:'header fade-in'},h('div',{className:'header-shuttle',innerHTML:SHUTTLE_SVG}),h('h1',null,'历史记录'),h('div',{className:'sub'},'你的大脑气象档案')));
+  const content=h('div',{className:'content'});
+  if(records.length===0){content.appendChild(h('div',{className:'empty-state'},'还没有记录\n你的大脑气象站尚未开始运营\n先去打一次卡吧 🏸'));}
+  else{[...records].reverse().forEach(r=>{
+    const item=h('div',{className:'history-item fade-in'});
+    item.appendChild(h('div',{className:'history-date'},r.date+' '+getWeekday(r.date)));
+    const chips=h('div',{className:'history-chips'});
+    QUESTIONS.forEach(q=>{const val=r.answers[q.id];if(val===undefined)return;const opt=q.options.find(o=>o.val===val);if(!opt)return;const sev=val>=(q.options.length>3?3:2)?'warn':val>=(q.options.length>3?2:1)?'mid':'';chips.appendChild(h('span',{className:'history-chip'+(sev?' '+sev:'')},opt.emoji+' '+q.label.slice(0,4)));});
+    item.appendChild(chips);
+    if(r.note)item.appendChild(h('div',{className:'history-note'},r.note));
+    content.appendChild(item);
+  });}
+  app.appendChild(content);
+}
+
+function renderReport(app){
+  app.appendChild(h('div',{className:'header fade-in'},h('div',{className:'header-shuttle',innerHTML:SHUTTLE_SVG}),h('h1',null,'看诊报告'),h('div',{className:'sub'},'自动生成，给医生看的')));
+  const content=h('div',{className:'content'});
+  if(records.length<3){content.appendChild(h('div',{className:'empty-state'},`至少记录3天才能生成报告\n目前已记录 ${records.length} 天 🏸`));app.appendChild(content);return;}
+  const last7=records.slice(-7),totalDays=records.length;
+  const dimColors={attention:'#1A8A5C',initiation:'#E8553A',memory:'#6B5BAE',emotion:'#1A3BC2',time:'#D4960A',body:'#C46A2A',sleep:'#7B4BAE',mood:'#1A3BC2'};
+  const dimLabels={attention:'注意力',initiation:'启动力',memory:'记忆',emotion:'情绪',time:'时间感',body:'身体',sleep:'睡眠',mood:'心情'};
+  let docText=`观察周期：${records[0].date} 至 ${records[records.length-1].date}（共${totalDays}天）\n\n`;
+  QUESTIONS.forEach((q,qi)=>{
+    if(qi===4){
+      const nd=h('div',{className:'net-divider'});
+      nd.appendChild(h('span',{className:'net-label'},'—— 中场休息 ——'));
+      content.appendChild(nd);
+    }
+    const sec=h('div',{className:'report-dim-card fade-in'});
+    sec.appendChild(h('div',{className:'report-dim-label'},h('span',null,q.icon),q.label));
+    const bars=h('div',{className:'report-bars'}),labels=h('div',{className:'report-bar-labels'}),maxVal=q.options.length-1;
+    last7.forEach(r=>{const val=r.answers[q.id];const pct=val!==undefined?((val/maxVal)*100):0;bars.appendChild(h('div',{className:'report-bar',style:{height:Math.max(4,pct*0.4)+'px',background:val!==undefined?dimColors[q.id]:'var(--border)'}}));labels.appendChild(h('div',{className:'report-bar-label'},r.date.slice(5)));});
+    sec.appendChild(bars);sec.appendChild(labels);
+    const allVals=records.map(r=>r.answers[q.id]).filter(v=>v!==undefined);
+    if(allVals.length>0){const avg=allVals.reduce((a,b)=>a+b,0)/allVals.length;const hc=allVals.filter(v=>v>=Math.ceil(maxVal*0.66)).length;const hp=Math.round(hc/allVals.length*100);const sl=avg<=maxVal*0.33?'轻微':avg<=maxVal*0.66?'中等':'明显';sec.appendChild(h('div',{className:'report-summary'},`${totalDays}天中，${hp}%的天数表现为中-重度。平均严重程度：${sl}。`));docText+=`【${q.label}】${totalDays}天中${hp}%表现为中-重度，平均程度${sl}\n`;}
+    content.appendChild(sec);
+  });
+  const notes=records.filter(r=>r.note).map(r=>`${r.date}: ${r.note}`);
+  if(notes.length>0)docText+='\n【自由备注摘录】\n'+notes.slice(-5).join('\n');
+  const netDiv2=h('div',{className:'net-divider'});
+  netDiv2.appendChild(h('span',{className:'net-label'},'—— 可导出区域 ——'));
+  content.appendChild(netDiv2);
+  const dc=h('div',{className:'report-for-doc fade-in'});
+  dc.appendChild(h('div',{className:'report-for-doc-title'},'📋 可复制给医生的文字版'));
+  dc.appendChild(h('div',{className:'report-for-doc-text'},docText));
+  dc.appendChild(h('button',{className:'btn-copy',onclick:()=>{navigator.clipboard.writeText(docText).then(()=>{toastData={icon:'✅',text:'已复制到剪贴板',sub:'可以直接发给姐姐或给医生看'};render();setTimeout(dismissToast,1800);}).catch(()=>{const range=document.createRange();range.selectNodeContents(dc.querySelector('.report-for-doc-text'));window.getSelection().removeAllRanges();window.getSelection().addRange(range);});}},'复制报告文字'));
+  content.appendChild(dc);app.appendChild(content);
+}
+
+function renderSettings(app){
+  app.appendChild(h('div',{className:'header fade-in'},h('div',{className:'header-shuttle',innerHTML:SHUTTLE_SVG}),h('h1',null,'设置')));
+  const content=h('div',{className:'content'});
+  content.appendChild(h('div',{className:'setting-row fade-in'},h('div',{className:'setting-label'},`已记录 ${records.length} 天`)));
+  content.appendChild(h('div',{className:'setting-row fade-in'},h('div',{className:'setting-label'},'导出数据（JSON）'),h('button',{className:'setting-action setting-export',onclick:()=>{const blob=new Blob([JSON.stringify(records,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brain-weather-data.json';a.click();}},'导出')));
+  content.appendChild(h('div',{className:'setting-row fade-in'},h('div',{className:'setting-label'},'清除所有数据'),h('button',{className:'setting-action setting-danger',onclick:()=>{if(confirm('确定要清除所有记录吗？这个操作不能撤销。')){records=[];saveData();toastData={icon:'🗑️',text:'已清除',sub:''};render();setTimeout(dismissToast,1500);}}},'清除')));
+  const inst=h('div',{className:'instruction-card fade-in'});
+  inst.appendChild(h('div',{className:'instruction-title'},'📱 添加到主屏幕'));
+  inst.appendChild(h('div',{className:'instruction-steps',innerHTML:'Safari打开这个页面 →<br>点底部中间的 <b>分享按钮</b>（方框+箭头那个）→<br>往下滑找到 <b>"添加到主屏幕"</b> →<br>点"添加"<br><br>之后桌面上就会出现一个图标，打开跟app一样 ✨'}));
+  content.appendChild(inst);
+  content.appendChild(h('div',{className:'empty-state',style:{marginTop:'32px'}},'🏸 脑子天气预报\n姐姐给你做的\n\n你的大脑值得被好好观察\n它虽然经常掉线 但一直在努力'));
+  app.appendChild(content);
+}
+
+loadData();render();
+
+})();
+</script>
+</body>
+</html>
