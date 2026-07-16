@@ -8,10 +8,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="脑子天气">
 <meta name="theme-color" content="#F5F0EB">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json?v=2.1.1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600;700;900&family=ZCOOL+KuaiLe&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;500;700&display=swap');
 
 :root {
   --bg: #F5F0EB;
@@ -32,7 +38,6 @@
 
   --charcoal: #2B2B2B;
 
-  /* dimension accents — saturated to match this bold palette */
   --acc-mint: #1A8A5C;
   --acc-mint-dim: rgba(26,138,92,0.10);
   --acc-coral: #E8553A;
@@ -49,6 +54,12 @@
   --acc-violet-dim: rgba(123,75,174,0.10);
   --acc-yellow: #B8940A;
   --acc-yellow-dim: rgba(184,148,10,0.12);
+  --acc-rose: #C24B6E;
+  --acc-rose-dim: rgba(194,75,110,0.10);
+  --acc-teal: #1A7A7A;
+  --acc-teal-dim: rgba(26,122,122,0.10);
+  --acc-orange: #C46A2A;
+  --acc-orange-dim: rgba(196,106,42,0.10);
 
   --text: #2B2B2B;
   --text2: #4A4A4A;
@@ -62,7 +73,7 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Noto Sans SC', sans-serif;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
@@ -80,6 +91,7 @@ body {
   font-size: 72px; opacity: 0.05;
   transform: rotate(-20deg);
   pointer-events: none; z-index: 0;
+  animation: bgDrift 20s ease-in-out infinite;
 }
 .bg-shuttle-2 {
   position: fixed; bottom: 100px; left: -8px;
@@ -87,7 +99,6 @@ body {
   transform: rotate(35deg);
   pointer-events: none; z-index: 0;
 }
-/* Bold color blobs */
 .bg-blob { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
 .bg-blob-1 {
   top: -80px; right: -60px;
@@ -98,6 +109,11 @@ body {
   bottom: -50px; left: -50px;
   width: 220px; height: 220px;
   background: radial-gradient(circle, rgba(232,85,58,0.05) 0%, transparent 70%);
+}
+
+@keyframes bgDrift {
+  0%,100% { transform: rotate(-20deg) translateY(0); }
+  50% { transform: rotate(-15deg) translateY(10px); }
 }
 
 /* ===== Header ===== */
@@ -116,7 +132,7 @@ body {
   50% { transform: translateY(-6px) rotate(6deg); }
 }
 .header h1 {
-  font-family: 'ZCOOL KuaiLe', cursive;
+  font-weight: 700;
   font-size: 24px;
   color: var(--blue);
   margin-top: 6px;
@@ -165,13 +181,39 @@ body {
   position: relative; z-index: 1;
 }
 .date-text { font-size: 13px; color: var(--dim); }
-.streak-pill {
-  font-size: 11px; font-weight: 600;
-  color: var(--red);
-  background: var(--red-dim);
-  padding: 4px 12px; border-radius: 20px;
-  display: flex; align-items: center; gap: 4px;
-  border: 1px solid rgba(232,85,58,0.18);
+
+/* ===== Mode selector ===== */
+.mode-selector {
+  display: flex; gap: 8px;
+  padding: 0 16px; margin-bottom: 14px;
+  position: relative; z-index: 1;
+}
+.mode-btn {
+  flex: 1;
+  padding: 14px 12px;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: var(--card);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--dim);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.mode-btn:active { transform: scale(0.96); }
+.mode-btn.sel-school {
+  border-color: var(--blue);
+  background: var(--blue-dim);
+  color: var(--blue);
+  box-shadow: 0 2px 12px rgba(26,59,194,0.12);
+}
+.mode-btn.sel-rest {
+  border-color: var(--acc-teal);
+  background: var(--acc-teal-dim);
+  color: var(--acc-teal);
+  box-shadow: 0 2px 12px rgba(26,122,122,0.12);
 }
 
 /* ===== Content ===== */
@@ -217,6 +259,7 @@ body {
   line-height: 1.3;
   display: flex; flex-direction: column;
   align-items: center; gap: 4px;
+  position: relative; overflow: hidden;
 }
 .opt:active { transform: scale(0.94); }
 .opt .opt-emoji { font-size: 20px; }
@@ -230,6 +273,43 @@ body {
 .opt-peach.sel { background: var(--acc-peach-dim); border-color: var(--acc-peach); color: var(--acc-peach); font-weight: 600; }
 .opt-violet.sel { background: var(--acc-violet-dim); border-color: var(--acc-violet); color: var(--acc-violet); font-weight: 600; }
 .opt-yellow.sel { background: var(--acc-yellow-dim); border-color: var(--acc-yellow); color: var(--acc-yellow); font-weight: 600; }
+.opt-rose.sel { background: var(--acc-rose-dim); border-color: var(--acc-rose); color: var(--acc-rose); font-weight: 600; }
+.opt-teal.sel { background: var(--acc-teal-dim); border-color: var(--acc-teal); color: var(--acc-teal); font-weight: 600; }
+.opt-orange.sel { background: var(--acc-orange-dim); border-color: var(--acc-orange); color: var(--acc-orange); font-weight: 600; }
+
+/* ===== Vent text box ===== */
+.vent-box {
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease;
+}
+.vent-box textarea {
+  width: 100%; background: var(--bg2);
+  border: 1.5px dashed var(--acc-rose);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 13px; font-family: inherit;
+  resize: none; outline: none;
+  min-height: 60px; line-height: 1.6;
+  padding: 10px 14px;
+}
+.vent-box textarea::placeholder { color: var(--dimmer); }
+.vent-privacy {
+  font-size: 10px; color: var(--acc-rose);
+  margin-top: 6px; text-align: center;
+  opacity: 0.8;
+}
+
+/* ===== Exercise feel sub-question ===== */
+.sub-question {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  animation: fadeIn 0.3s ease;
+}
+.sub-question .sub-label {
+  font-size: 12px; color: var(--dim);
+  margin-bottom: 8px; font-weight: 600;
+}
 
 /* ===== Note ===== */
 .note-card {
@@ -254,7 +334,7 @@ body {
 .btn-submit {
   width: 100%; padding: 15px;
   border-radius: 16px; border: none;
-  font-family: 'ZCOOL KuaiLe', cursive;
+  font-weight: 700;
   font-size: 17px; cursor: pointer;
   transition: all 0.2s; letter-spacing: 1px;
 }
@@ -294,7 +374,7 @@ body {
   50% { transform: rotate(5deg) scale(1); }
 }
 .done-title {
-  font-family: 'ZCOOL KuaiLe', cursive;
+  font-weight: 700;
   font-size: 22px; color: var(--blue);
   margin-top: 12px;
 }
@@ -308,6 +388,35 @@ body {
   background: var(--bg2);
   display: inline-block;
   padding: 6px 14px; border-radius: 10px;
+}
+
+/* ===== Answered card arc decoration ===== */
+.q-card.answered { position: relative; }
+.q-card.answered::after {
+  content: '';
+  position: absolute;
+  top: 8px; right: 12px;
+  width: 24px; height: 12px;
+  border: 2px solid var(--blue);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  opacity: 0.2;
+}
+
+/* ===== Shuttle streak badge ===== */
+.streak-badge {
+  font-size: 11px; font-weight: 600;
+  color: var(--red);
+  background: var(--red-dim);
+  padding: 4px 10px 4px 6px;
+  border-radius: 12px 20px 20px 12px;
+  display: flex; align-items: center; gap: 4px;
+  border: 1px solid rgba(232,85,58,0.18);
+  position: relative;
+}
+.streak-badge::before {
+  content: '🏸';
+  font-size: 13px;
 }
 
 /* ===== Nav ===== */
@@ -389,6 +498,53 @@ body {
 }
 .btn-copy:active { transform: scale(0.97); }
 
+/* ===== Report section headers ===== */
+.report-section-header {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--blue);
+  margin: 18px 0 10px;
+  padding: 8px 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.report-section-header .section-icon { font-size: 18px; }
+
+/* ===== Net divider ===== */
+.net-divider {
+  height: 16px;
+  margin: 14px 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.net-divider::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--border);
+}
+.net-divider::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 8px;
+  background: repeating-linear-gradient(90deg, transparent, transparent 8px, var(--border) 8px, var(--border) 9px);
+  transform: translateY(-50%);
+  opacity: 0.5;
+}
+.net-label {
+  position: relative; z-index: 1;
+  background: var(--bg);
+  padding: 0 10px;
+  margin: 0 auto;
+  font-size: 10px;
+  color: var(--dimmer);
+  white-space: nowrap;
+}
+
 /* ===== History ===== */
 .history-item {
   background: var(--card);
@@ -399,6 +555,14 @@ body {
   box-shadow: 0 1px 4px rgba(43,43,43,0.04);
 }
 .history-date { font-size: 12px; color: var(--dim); margin-bottom: 8px; font-weight: 600; }
+.history-mode {
+  display: inline-block;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 6px;
+  margin-left: 8px;
+}
+.history-mode.school { background: var(--blue-dim); color: var(--blue); }
+.history-mode.rest { background: var(--acc-teal-dim); color: var(--acc-teal); }
 .history-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .history-chip {
   font-size: 11px; padding: 3px 9px;
@@ -413,6 +577,27 @@ body {
   padding-left: 4px;
   border-left: 2px solid var(--border);
 }
+
+/* ===== History: vent indicator ===== */
+.history-vent-indicator {
+  font-size: 10px; color: var(--acc-rose);
+  margin-top: 6px; display: flex; align-items: center; gap: 4px;
+}
+
+/* ===== History filter tabs ===== */
+.history-filter {
+  display: flex; gap: 6px;
+  padding: 0 16px; margin-bottom: 12px;
+}
+.filter-btn {
+  padding: 6px 14px; border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  font-size: 12px; font-family: inherit;
+  color: var(--dim); cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); font-weight: 600; }
 
 /* ===== Settings ===== */
 .setting-row {
@@ -463,79 +648,25 @@ body {
   white-space: pre-line;
 }
 
-/* ===== Answered card arc decoration ===== */
-.q-card.answered { position: relative; }
-.q-card.answered::after {
-  content: '';
-  position: absolute;
-  top: 8px; right: 12px;
-  width: 24px; height: 12px;
+/* ===== Toast ===== */
+.toast-overlay { position:fixed; inset:0; background:rgba(43,43,43,0.15); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:199; }
+.toast {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--card);
   border: 2px solid var(--blue);
-  border-bottom: none;
-  border-radius: 24px 24px 0 0;
-  opacity: 0.2;
+  border-radius: 20px;
+  padding: 28px 36px; text-align: center;
+  z-index: 200; animation: toastIn 0.3s ease;
+  box-shadow: 0 20px 60px rgba(43,43,43,0.18);
+  overflow: hidden;
 }
+@keyframes toastIn { from { opacity:0; transform:translate(-50%,-50%) scale(0.9); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+.toast-icon { font-size: 44px; position: relative; z-index: 1; }
+.toast-text { font-size: 15px; color: var(--text); margin-top: 10px; font-weight: 600; position: relative; z-index: 1; }
+.toast-sub { font-size: 12px; color: var(--dim); margin-top: 6px; line-height: 1.5; position: relative; z-index: 1; }
 
-/* ===== Shuttle streak badge ===== */
-.streak-badge {
-  font-size: 11px; font-weight: 600;
-  color: var(--red);
-  background: var(--red-dim);
-  padding: 4px 10px 4px 6px;
-  border-radius: 12px 20px 20px 12px;
-  display: flex; align-items: center; gap: 4px;
-  border: 1px solid rgba(232,85,58,0.18);
-  position: relative;
-}
-.streak-badge::before {
-  content: '🏸';
-  font-size: 13px;
-}
-
-/* ===== Net divider for report ===== */
-.net-divider {
-  height: 16px;
-  margin: 14px 0;
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.net-divider::before {
-  content: '';
-  position: absolute;
-  left: 0; right: 0;
-  top: 50%;
-  height: 1px;
-  background: var(--border);
-}
-.net-divider::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0;
-  top: 50%;
-  height: 8px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 8px,
-    var(--border) 8px,
-    var(--border) 9px
-  );
-  transform: translateY(-50%);
-  opacity: 0.5;
-}
-.net-label {
-  position: relative;
-  z-index: 1;
-  background: var(--bg);
-  padding: 0 10px;
-  margin: 0 auto;
-  font-size: 10px;
-  color: var(--dimmer);
-  white-space: nowrap;
-}
-
-/* ===== Smash trajectory on toast ===== */
+/* Smash trajectory on toast */
 .toast-trajectory {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -570,174 +701,233 @@ body {
   0% { opacity: 0; } 30% { opacity: 0.4; } 100% { opacity: 0; }
 }
 
-/* ===== Abstract loading shimmer on options ===== */
-.opt:not(.sel)::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  background: linear-gradient(90deg, transparent 30%, rgba(26,59,194,0.03) 50%, transparent 70%);
-  background-size: 200% 100%;
-  opacity: 0;
-}
-.opt { position: relative; overflow: hidden; }
-
-/* ===== Shuttle trail on page transitions ===== */
-.shuttle-trail {
-  position: fixed;
-  top: 50%; left: -30px;
-  font-size: 24px;
-  z-index: 150;
-  pointer-events: none;
-  animation: trailFly 0.5s ease-out forwards;
-}
-@keyframes trailFly {
-  0% { left: -30px; top: 60%; opacity: 0.7; transform: rotate(-30deg); }
-  100% { left: 110%; top: 30%; opacity: 0; transform: rotate(15deg); }
-}
-
-/* ===== Random rotation for bg shuttles ===== */
-.bg-shuttle { animation: bgDrift 20s ease-in-out infinite; }
-@keyframes bgDrift {
-  0%,100% { transform: rotate(-20deg) translateY(0); }
-  50% { transform: rotate(-15deg) translateY(10px); }
-}
-
 .fade-in { animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-.toast-overlay { position:fixed; inset:0; background:rgba(43,43,43,0.15); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:199; }
-.toast {
+/* ===== Vent history view ===== */
+.vent-history-item {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--acc-rose);
+  border-left: 3px solid var(--acc-rose);
+  margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(194,75,110,0.08);
+}
+.vent-history-date {
+  font-size: 11px; color: var(--acc-rose); font-weight: 600; margin-bottom: 6px;
+}
+.vent-history-level {
+  font-size: 12px; color: var(--dim); margin-bottom: 6px;
+}
+.vent-history-text {
+  font-size: 13px; color: var(--text); line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* ===== Weekly report modal ===== */
+.weekly-modal {
   position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   background: var(--card);
   border: 2px solid var(--blue);
   border-radius: 20px;
-  padding: 28px 36px; text-align: center;
-  z-index: 200; animation: toastIn 0.3s ease;
-  box-shadow: 0 20px 60px rgba(43,43,43,0.18);
-  position: relative; overflow: hidden;
+  padding: 24px 20px;
+  z-index: 200;
+  width: calc(100% - 40px);
+  max-width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: toastIn 0.3s ease;
+  box-shadow: 0 20px 60px rgba(43,43,43,0.2);
+  text-align: center;
 }
-@keyframes toastIn { from { opacity:0; transform:translate(-50%,-50%) scale(0.9); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
-.toast-icon { font-size: 44px; position: relative; z-index: 1; }
-.toast-text { font-size: 15px; color: var(--text); margin-top: 10px; font-weight: 600; position: relative; z-index: 1; }
-.toast-sub { font-size: 12px; color: var(--dim); margin-top: 6px; line-height: 1.5; position: relative; z-index: 1; }
+.weekly-modal canvas {
+  width: 100%; border-radius: 12px;
+  border: 1px solid var(--border-light);
+  margin-bottom: 14px;
+}
+.weekly-btns {
+  display: flex; gap: 8px;
+}
+.weekly-btn {
+  flex: 1; padding: 12px;
+  border-radius: 12px; border: none;
+  font-weight: 700;
+  font-size: 14px; cursor: pointer;
+}
+.weekly-btn-primary {
+  background: var(--blue); color: var(--white);
+  box-shadow: 0 3px 12px rgba(26,59,194,0.25);
+}
+.weekly-btn-secondary {
+  background: var(--bg2); color: var(--dim);
+  border: 1.5px solid var(--border);
+}
+.weekly-btn:active { transform: scale(0.97); }
+
+/* Weekly reminder banner */
+.weekly-reminder {
+  margin: 0 16px 14px;
+  padding: 14px 18px;
+  background: var(--card);
+  border-radius: 16px;
+  border: 2px solid var(--yellow);
+  position: relative; z-index: 1;
+  box-shadow: 0 2px 12px rgba(242,201,76,0.2);
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer;
+}
+.weekly-reminder:active { transform: scale(0.98); }
+.weekly-reminder-icon { font-size: 28px; }
+.weekly-reminder-text { flex: 1; }
+.weekly-reminder-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--text); margin-bottom: 2px;
+}
+.weekly-reminder-sub {
+  font-size: 11px; color: var(--dim);
+}
+.weekly-reminder-arrow {
+  font-size: 16px; color: var(--dimmer);
+}
+
+/* ===== Update log modal ===== */
+.update-log-modal {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--card);
+  border: 2px solid var(--blue);
+  border-radius: 20px;
+  padding: 28px 24px;
+  z-index: 200;
+  width: calc(100% - 48px);
+  max-width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: toastIn 0.3s ease;
+  box-shadow: 0 20px 60px rgba(43,43,43,0.2);
+}
+.update-log-title {
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--blue);
+  text-align: center;
+  margin-bottom: 16px;
+}
+.update-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.update-log-item {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border-radius: 10px;
+}
+.update-log-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: var(--blue);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 12px rgba(26,59,194,0.25);
+}
+.update-log-btn:active { transform: scale(0.97); }
+
 /* ===== iPad / Tablet adaptation ===== */
 @media (min-width: 768px) {
-  #app {
-    max-width: 720px;
-    padding-bottom: 120px;
-  }
-
-  /* Header */
+  #app { max-width: 720px; padding-bottom: 120px; }
   .header { padding: 56px 32px 24px; }
   .header-shuttle { width: 72px; height: 72px; }
   .header-shuttle svg { width: 72px; height: 72px; }
   .header h1 { font-size: 36px; margin-top: 12px; letter-spacing: 3px; }
   .header .sub { font-size: 17px; margin-top: 10px; }
-
-  /* Philosophy card */
   .philo-card { margin: 0 24px 20px; padding: 20px 26px 20px 30px; border-radius: 20px; }
   .philo-card::after { width: 5px; }
   .philo-text { font-size: 18px; line-height: 1.8; }
   .philo-source { font-size: 15px; margin-top: 8px; }
-
-  /* Date bar */
   .date-bar { padding: 0 28px; margin-bottom: 20px; }
   .date-text { font-size: 17px; }
   .streak-badge { font-size: 15px; padding: 6px 16px 6px 10px; border-radius: 14px 24px 24px 14px; }
   .streak-badge::before { font-size: 18px; }
-
-  /* Content */
+  .mode-selector { padding: 0 24px; margin-bottom: 20px; gap: 12px; }
+  .mode-btn { padding: 18px 16px; border-radius: 18px; font-size: 20px; }
   .content { padding: 0 24px; }
-
-  /* Question cards */
   .q-card { padding: 22px 24px; margin-bottom: 14px; border-radius: 20px; }
   .q-label { font-size: 18px; margin-bottom: 14px; gap: 10px; }
   .q-label .icon { font-size: 22px; }
   .q-label .abstract { font-size: 14px; padding: 3px 12px; border-radius: 10px; }
-
   .options { gap: 10px; }
   .opt { padding: 14px 8px; border-radius: 14px; border-width: 2px; gap: 6px; }
   .opt .opt-emoji { font-size: 28px; }
   .opt .opt-text { font-size: 15px; }
-
-  /* Answered arc */
   .q-card.answered::after { width: 32px; height: 16px; top: 12px; right: 16px; border-width: 3px; }
-
-  /* Note */
   .note-card { padding: 22px 24px; border-radius: 20px; }
   .note-card textarea { font-size: 17px; min-height: 56px; }
-
-  /* Submit */
   .submit-wrap { margin: 28px 0; }
   .btn-submit { padding: 20px; border-radius: 20px; font-size: 22px; }
-
-  /* Done card */
   .done-card { padding: 48px 36px; border-radius: 24px; }
   .done-shuttle { font-size: 72px; }
   .done-title { font-size: 30px; margin-top: 16px; }
   .done-sub { font-size: 18px; margin-top: 14px; }
   .done-abstract { font-size: 16px; margin-top: 18px; padding: 10px 20px; border-radius: 14px; }
-
-  /* Nav bar */
   .nav-bar { max-width: 720px; padding-bottom: env(safe-area-inset-bottom, 8px); }
   .nav-tab { padding: 14px 0 10px; font-size: 14px; gap: 4px; }
   .nav-tab .nav-icon { font-size: 24px; }
-
-  /* Report */
   .report-dim-card { padding: 20px 22px; border-radius: 18px; margin-bottom: 14px; }
   .report-dim-label { font-size: 16px; gap: 8px; margin-bottom: 12px; }
   .report-bars { height: 56px; gap: 6px; }
-  .report-bar { border-radius: 5px 5px 0 0; }
   .report-bar-labels { gap: 6px; margin-top: 6px; }
   .report-bar-label { font-size: 12px; }
   .report-summary { font-size: 16px; margin-top: 10px; padding: 12px 14px; border-radius: 10px; }
-  .report-for-doc { padding: 24px; border-radius: 20px; border-width: 2.5px; }
+  .report-for-doc { padding: 24px; border-radius: 20px; }
   .report-for-doc-title { font-size: 18px; margin-bottom: 14px; }
   .report-for-doc-text { font-size: 15px; line-height: 1.9; }
   .btn-copy { padding: 16px 24px; border-radius: 14px; font-size: 17px; }
-
-  /* History */
   .history-item { padding: 18px 22px; border-radius: 18px; margin-bottom: 12px; }
   .history-date { font-size: 15px; margin-bottom: 10px; }
   .history-chips { gap: 8px; }
   .history-chip { font-size: 14px; padding: 5px 12px; border-radius: 10px; }
   .history-note { font-size: 14px; margin-top: 10px; padding-left: 8px; }
-
-  /* Settings */
   .setting-row { padding: 18px 22px; border-radius: 18px; margin-bottom: 12px; }
   .setting-label { font-size: 17px; }
   .setting-action { padding: 10px 22px; border-radius: 12px; font-size: 15px; }
   .instruction-card { padding: 22px 24px; border-radius: 18px; margin-top: 20px; }
   .instruction-title { font-size: 17px; margin-bottom: 12px; }
   .instruction-steps { font-size: 16px; line-height: 1.9; }
-
   .empty-state { padding: 56px 28px; font-size: 17px; line-height: 2; }
-
-  /* Net divider */
   .net-divider { height: 24px; margin: 20px 0; }
   .net-label { font-size: 13px; padding: 0 14px; }
-
-  /* Toast */
   .toast { padding: 40px 52px; border-radius: 24px; }
   .toast-icon { font-size: 60px; }
   .toast-text { font-size: 20px; margin-top: 14px; }
   .toast-sub { font-size: 16px; margin-top: 8px; }
-
-  /* BG decorations scale up */
   .bg-shuttle { font-size: 100px; top: 30px; right: 12px; }
   .bg-shuttle-2 { font-size: 70px; }
   .bg-blob-1 { width: 360px; height: 360px; }
   .bg-blob-2 { width: 300px; height: 300px; }
+  .vent-box textarea { font-size: 17px; min-height: 80px; padding: 14px 18px; }
+  .vent-privacy { font-size: 13px; }
+  .report-section-header { font-size: 20px; margin: 24px 0 14px; }
+  .update-log-modal { max-width: 500px; padding: 36px 32px; }
+  .update-log-title { font-size: 26px; }
+  .update-log-item { font-size: 16px; padding: 10px 16px; }
+  .update-log-btn { padding: 18px; font-size: 20px; }
 }
-
-/* Extra wide landscape iPad */
 @media (min-width: 1024px) {
   #app { max-width: 800px; }
   .nav-bar { max-width: 800px; }
 }
-
 </style>
 </head>
 <body>
@@ -746,6 +936,8 @@ body {
 <script>
 (function(){
 'use strict';
+
+const APP_VERSION = '2.1.1';
 
 const SHUTTLE_SVG = `<svg viewBox="0 0 64 64" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
   <ellipse cx="32" cy="20" rx="11" ry="14" fill="#FFFFFF" stroke="#1A3BC2" stroke-width="1.4"/>
@@ -790,7 +982,7 @@ const QUOTES = [
   { text: "逻辑能把你从A带到B，想象力能带你去任何地方。", src: "爱因斯坦" },
 ];
 
-const ABSTRACT_DONE = [
+const ABSTRACT_DONE_SCHOOL = [
   "今日大脑气象数据已归档。你的脑子表示感谢被关注。",
   "记录完毕。你的神经递质已被通知。",
   "打卡成功。一只羽毛球从你的脑海划过以示庆祝。",
@@ -807,6 +999,24 @@ const ABSTRACT_DONE = [
   "数据已保存。你的前扣带回皮层发来贺电。",
 ];
 
+const ABSTRACT_DONE_REST = [
+  "你的多巴胺表示今天营业愉快。",
+  "你的杏仁核今天没加班，它很感激。",
+  "休息日大脑气象数据已归档。放假的脑子也值得被记录。",
+  "今日户外探索经验值 +1。前额叶表示它其实挺喜欢出门的。",
+  "放假模式数据收录完毕。你的基底神经节表示今天很满意。",
+  "休息日打卡完成。你的大脑说：谢谢你在我放假时也没忘了我。",
+  "记录成功。你的丘脑表示它今天也在放假，但还是给你点了赞。",
+  "成功！一个平行宇宙的你今天也在享受休息日。",
+];
+
+const EXERCISE_EASTER_EGGS = [
+  "科学事实：你刚给大脑发了一颗天然兴奋剂，合法的那种 🏸",
+  "你的血清素刚完成了一场 rally。",
+  "运动完的大脑 = 充好电的手机。科学认证。",
+  "你的 BDNF（脑源性神经营养因子）正在给神经元浇花。",
+];
+
 const STREAK_MSGS = [
   "",
   "第一天！发球权在你手上。",
@@ -818,7 +1028,8 @@ const STREAK_MSGS = [
   "一整周！🏸 21:0 完胜拖延症。",
 ];
 
-const QUESTIONS = [
+/* ===== Question definitions ===== */
+const Q_SCHOOL = [
   { id:'attention', icon:'🎯', label:'今天脑子飘了多少', abstract:'注意力天气', color:'mint',
     options:[ {emoji:'🏸',text:'稳如老狗',val:0},{emoji:'🪁',text:'偶尔飘一下',val:1},{emoji:'🌪️',text:'半天在神游',val:2},{emoji:'🕳️',text:'人在教室魂在外太空',val:3} ] },
   { id:'initiation', icon:'🚀', label:'该做的事启动得了吗', abstract:'发动机状况', color:'coral',
@@ -833,163 +1044,1154 @@ const QUESTIONS = [
     options:[ {emoji:'🧘',text:'很稳',val:0},{emoji:'🦵',text:'抖腿转笔',val:1},{emoji:'🐒',text:'完全坐不住',val:2} ] },
   { id:'sleep', icon:'🌙', label:'昨晚躺下后脑子跑了多久', abstract:'夜间脑内马拉松', color:'violet',
     options:[ {emoji:'😴',text:'秒睡',val:0},{emoji:'🐑',text:'跑了一小会儿',val:1},{emoji:'🏃',text:'半小时以上',val:2},{emoji:'🎪',text:'脑内开了演唱会',val:3} ] },
-  { id:'mood', icon:'🏸', label:'总体心情', abstract:'今日比赛结果', color:'yellow',
-    options:[ {emoji:'🌟',text:'很好',val:0},{emoji:'🙂',text:'还行',val:1},{emoji:'😐',text:'一般',val:2},{emoji:'😮‍💨',text:'不太行',val:3},{emoji:'🌧️',text:'很差',val:4} ] },
+  { id:'vent', icon:'🔒', label:'今日吐槽时间', abstract:'情绪树洞', color:'rose', isVent:true,
+    options:[ {emoji:'😇',text:'今天天下太平',val:0},{emoji:'😤',text:'有点不爽但忍住了',val:1},{emoji:'🤬',text:'很想骂人',val:2},{emoji:'🌋',text:'不骂会爆炸',val:3} ] },
 ];
 
-let records=[],currentTab='checkin',answers={},noteText='',toastData=null;
+const Q_REST = [
+  { id:'attention', icon:'🎯', label:'今天脑子飘了多少', abstract:'注意力天气', color:'mint',
+    options:[ {emoji:'🏸',text:'做自己的事时很专注',val:0},{emoji:'🪁',text:'看视频/看书偶尔走神',val:1},{emoji:'🌪️',text:'干啥都集中不了',val:2},{emoji:'🕳️',text:'脑子完全不受控制',val:3} ] },
+  { id:'emotion', icon:'🎢', label:'情绪波动', abstract:'内心天气', color:'sky',
+    options:[ {emoji:'😶',text:'平静',val:0},{emoji:'🌊',text:'有点波动',val:1},{emoji:'🎢',text:'过山车',val:2},{emoji:'🌋',text:'火山爆发级',val:3} ] },
+  { id:'sleep', icon:'🌙', label:'昨晚躺下后脑子跑了多久', abstract:'夜间脑内马拉松', color:'violet',
+    options:[ {emoji:'😴',text:'秒睡',val:0},{emoji:'🐑',text:'跑了一小会儿',val:1},{emoji:'🏃',text:'半小时以上',val:2},{emoji:'🎪',text:'脑内开了演唱会',val:3} ] },
+  { id:'body', icon:'🦵', label:'坐得住吗', abstract:'物理稳定性', color:'peach',
+    options:[ {emoji:'🧘',text:'很稳',val:0},{emoji:'🦵',text:'抖腿转笔',val:1},{emoji:'🐒',text:'完全坐不住',val:2} ] },
+  { id:'outing', icon:'🚪', label:'今天出门了吗', abstract:'今日活动半径', color:'teal',
+    options:[ {emoji:'🏠',text:'宅家一整天',val:0},{emoji:'🚶',text:'出去了一小会儿',val:1},{emoji:'🌍',text:'大半天在外面',val:2},{emoji:'🏃',text:'一整天都在外面跑',val:3} ] },
+  { id:'exercise', icon:'🏸', label:'今天运动了吗', abstract:'今日运动战报', color:'mint', hasSubQ:true,
+    options:[ {emoji:'🛋️',text:'没怎么动',val:0},{emoji:'🚶',text:'走了很多路',val:1},{emoji:'🏃',text:'做了其他运动',val:2},{emoji:'🏸',text:'打羽毛球了！',val:3} ],
+    subQ:{ id:'exerciseFeel', label:'运动后大脑感觉怎样', showWhen:1,
+      options:[ {emoji:'😌',text:'脑子安静多了',val:0},{emoji:'😊',text:'心情变好了',val:1},{emoji:'😮‍💨',text:'焦虑少了一些',val:2},{emoji:'🤷',text:'没啥特别感觉',val:3},{emoji:'😫',text:'更累了/更烦了',val:4} ] }
+  },
+  { id:'timeSpent', icon:'⏰', label:'时间去哪了', abstract:'今日时间审计', color:'amber',
+    options:[ {emoji:'🎯',text:'安排了计划而且做到了',val:0},{emoji:'⏱️',text:'做了想做的事，挺充实',val:1},{emoji:'📱',text:'回过神来刷了很久手机',val:2},{emoji:'😶',text:'一天就过去了不知道干了啥',val:3},{emoji:'🎢',text:'一会儿充实一会儿空虚',val:4} ] },
+  { id:'boredom', icon:'🫠', label:'无聊感', abstract:'刺激需求指数', color:'orange',
+    options:[ {emoji:'🧊',text:'平静，不需要找事做',val:0},{emoji:'🫠',text:'有点无聊但还好',val:1},{emoji:'🐒',text:'无聊得要命，到处找刺激',val:2},{emoji:'💥',text:'无聊到烦躁了',val:3} ] },
+  { id:'vent', icon:'🔒', label:'今日吐槽时间', abstract:'情绪树洞', color:'rose', isVent:true,
+    options:[ {emoji:'😇',text:'今天天下太平',val:0},{emoji:'😤',text:'有点不爽但忍住了',val:1},{emoji:'🤬',text:'很想骂人',val:2},{emoji:'🌋',text:'不骂会爆炸',val:3} ] },
+];
 
-function getToday(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function getWeekday(ds){return ['周日','周一','周二','周三','周四','周五','周六'][new Date(ds).getDay()];}
-function todayDone(){return records.some(r=>r.date===getToday());}
-function getStreak(){let s=0,d=new Date();if(!todayDone())d.setDate(d.getDate()-1);while(true){const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;if(records.some(r=>r.date===ds)){s++;d.setDate(d.getDate()-1);}else break;}return s;}
-function getDayQuote(){const d=new Date();return QUOTES[(d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate())%QUOTES.length];}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
-function saveData(){try{localStorage.setItem('brainweather_v4',JSON.stringify(records));}catch(e){}}
-function loadData(){try{const d=localStorage.getItem('brainweather_v4');if(d)records=JSON.parse(d);}catch(e){}}
+/* ===== Update log ===== */
+const UPDATE_LOG = {
+  version: '2.1.1',
+  title: '🏸 v2.1 周报来了！',
+  items: [
+    '📸 新增「一键生成周报图片」— 可以下载或分享给姐姐看',
+    '📅 每周日打开 app 会提醒你生成周报',
+    '✨ 全站统一使用 M PLUS Rounded 圆体，不会再混搭了',
+  ],
+};
 
-function h(tag,attrs,...ch){
-  const el=document.createElement(tag);
-  if(attrs)Object.entries(attrs).forEach(([k,v])=>{
-    if(k==='className')el.className=v;
-    else if(k==='style'&&typeof v==='object')Object.assign(el.style,v);
-    else if(k.startsWith('on'))el[k]=v;
-    else if(k==='innerHTML')el.innerHTML=v;
-    else el.setAttribute(k,v);
+/* ===== State ===== */
+let records = [];
+let currentTab = 'checkin';
+let currentMode = null; // 'school' or 'rest'
+let answers = {};
+let noteText = '';
+let ventText = '';
+let toastData = null;
+let historyFilter = 'all'; // 'all', 'school', 'rest'
+let animateTransition = true; // only true on tab switch / first load
+let showUpdateLog = false;
+let showWeeklyReport = false;
+let showWeeklyReminder = false;
+
+/* ===== Utility functions ===== */
+function getToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function getWeekday(ds) {
+  return ['周日','周一','周二','周三','周四','周五','周六'][new Date(ds).getDay()];
+}
+function todayDone() {
+  return records.some(r => r.date === getToday());
+}
+function getTodayRecord() {
+  return records.find(r => r.date === getToday());
+}
+function getStreak() {
+  let s = 0, d = new Date();
+  if (!todayDone()) d.setDate(d.getDate() - 1);
+  while (true) {
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (records.some(r => r.date === ds)) { s++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  return s;
+}
+function getDayQuote() {
+  const d = new Date();
+  return QUOTES[(d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate()) % QUOTES.length];
+}
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+/* ===== Data persistence ===== */
+const STORAGE_KEY = 'brainweather_v2';
+
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); } catch(e) {}
+}
+function loadData() {
+  try {
+    // Try v2 first
+    const d2 = localStorage.getItem(STORAGE_KEY);
+    if (d2) { records = JSON.parse(d2); return; }
+    // Migrate v1 data
+    const d1 = localStorage.getItem('brainweather_v4');
+    if (d1) {
+      const old = JSON.parse(d1);
+      // Tag all v1 records as school mode
+      records = old.map(r => ({ ...r, mode: 'school' }));
+      saveData();
+    }
+  } catch(e) {}
+}
+
+/* ===== DOM helper ===== */
+function h(tag, attrs, ...ch) {
+  const el = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => {
+    if (k === 'className') el.className = v;
+    else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+    else if (k.startsWith('on')) el[k] = v;
+    else if (k === 'innerHTML') el.innerHTML = v;
+    else el.setAttribute(k, v);
   });
-  ch.flat(Infinity).forEach(c=>{if(c==null||c===false)return;el.appendChild(typeof c==='string'?document.createTextNode(c):c);});
+  ch.flat(Infinity).forEach(c => {
+    if (c == null || c === false) return;
+    el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
   return el;
 }
 
-function render(){
-  const app=document.getElementById('app');app.innerHTML='';
-  app.appendChild(h('div',{className:'bg-shuttle'},'🏸'));
-  app.appendChild(h('div',{className:'bg-shuttle-2'},'🏸'));
-  app.appendChild(h('div',{className:'bg-blob bg-blob-1'}));
-  app.appendChild(h('div',{className:'bg-blob bg-blob-2'}));
-  if(currentTab==='checkin')renderCheckin(app);
-  else if(currentTab==='history')renderHistory(app);
-  else if(currentTab==='report')renderReport(app);
-  else if(currentTab==='settings')renderSettings(app);
-  const nav=h('div',{className:'nav-bar'});
-  [{id:'checkin',icon:'🏸',label:'打卡'},{id:'history',icon:'📋',label:'记录'},{id:'report',icon:'📊',label:'报告'},{id:'settings',icon:'⚙️',label:'设置'}].forEach(t=>{
-    nav.appendChild(h('button',{className:'nav-tab'+(currentTab===t.id?' active':''),onclick:()=>{currentTab=t.id;render();}},h('span',{className:'nav-icon'},t.icon),t.label));
+/* ===== Get questions for current mode ===== */
+function getQuestions() {
+  return currentMode === 'rest' ? Q_REST : Q_SCHOOL;
+}
+
+/* ===== Animation helper ===== */
+function anim(cls) {
+  // Only add fade-in when transitioning between tabs
+  return animateTransition ? cls + ' fade-in' : cls;
+}
+
+/* ===== Main render ===== */
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  app.appendChild(h('div', {className: 'bg-shuttle'}, '🏸'));
+  app.appendChild(h('div', {className: 'bg-shuttle-2'}, '🏸'));
+  app.appendChild(h('div', {className: 'bg-blob bg-blob-1'}));
+  app.appendChild(h('div', {className: 'bg-blob bg-blob-2'}));
+
+  if (currentTab === 'checkin') renderCheckin(app);
+  else if (currentTab === 'history') renderHistory(app);
+  else if (currentTab === 'report') renderReport(app);
+  else if (currentTab === 'vent-diary') renderVentDiary(app);
+  else if (currentTab === 'settings') renderSettings(app);
+
+  const nav = h('div', {className: 'nav-bar'});
+  [
+    {id:'checkin', icon:'🏸', label:'打卡'},
+    {id:'history', icon:'📋', label:'记录'},
+    {id:'report', icon:'📊', label:'报告'},
+    {id:'vent-diary', icon:'🔒', label:'树洞'},
+    {id:'settings', icon:'⚙️', label:'设置'},
+  ].forEach(t => {
+    nav.appendChild(h('button', {
+      className: 'nav-tab' + (currentTab === t.id ? ' active' : ''),
+      onclick: () => { animateTransition = true; currentTab = t.id; render(); }
+    }, h('span', {className: 'nav-icon'}, t.icon), t.label));
   });
   app.appendChild(nav);
-  if(toastData){
-    app.appendChild(h('div',{className:'toast-overlay',onclick:dismissToast}));
-    const toastEl=h('div',{className:'toast',style:{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)'}},h('div',{className:'toast-trajectory'}),h('div',{className:'toast-icon'},toastData.icon),h('div',{className:'toast-text'},toastData.text),toastData.sub?h('div',{className:'toast-sub'},toastData.sub):null);
+
+  if (toastData) {
+    app.appendChild(h('div', {className: 'toast-overlay', onclick: dismissToast}));
+    const toastEl = h('div', {className: 'toast'},
+      h('div', {className: 'toast-trajectory'}),
+      h('div', {className: 'toast-icon'}, toastData.icon),
+      h('div', {className: 'toast-text'}, toastData.text),
+      toastData.sub ? h('div', {className: 'toast-sub'}, toastData.sub) : null
+    );
     app.appendChild(toastEl);
   }
-}
-function dismissToast(){toastData=null;render();}
 
-function renderCheckin(app){
-  const hdr=h('div',{className:'header fade-in'});
-  hdr.appendChild(h('div',{className:'header-shuttle',innerHTML:SHUTTLE_SVG}));
-  hdr.appendChild(h('h1',null,'脑子天气预报'));
-  hdr.appendChild(h('div',{className:'sub'},'每天30秒，观察你的大脑在干什么'));
-  app.appendChild(hdr);
-  const q=getDayQuote();
-  app.appendChild(h('div',{className:'philo-card fade-in'},h('div',{className:'philo-text'},q.text),h('div',{className:'philo-source'},'—— '+q.src)));
-  const streak=getStreak();
-  app.appendChild(h('div',{className:'date-bar fade-in'},h('div',{className:'date-text'},getToday()+' '+getWeekday(getToday())),streak>0?h('div',{className:'streak-badge'},`连续${streak}天`):null));
-  const content=h('div',{className:'content'});
-  if(todayDone()){
-    const absMsg=ABSTRACT_DONE[Math.floor(Math.random()*ABSTRACT_DONE.length)];
-    const sm=streak<=7?(STREAK_MSGS[streak]||`连续${streak}天了！`):`连续${streak}天！你比大部分成年人都能坚持。`;
-    content.appendChild(h('div',{className:'done-card fade-in'},h('div',{className:'done-shuttle'},'🏸'),h('div',{className:'done-title'},'今天已经记录过啦'),h('div',{className:'done-sub'},sm),h('div',{className:'done-abstract'},absMsg)));
-  } else {
-    QUESTIONS.forEach((q,qi)=>{
-      const card=h('div',{className:'q-card fade-in'+(answers[q.id]!==undefined?' answered':''),style:{animationDelay:(qi*0.04)+'s'}});
-      card.appendChild(h('div',{className:'q-label'},h('span',{className:'icon'},q.icon),q.label,h('span',{className:'abstract'},q.abstract)));
-      const optRow=h('div',{className:'options'});
-      q.options.forEach(o=>{optRow.appendChild(h('button',{className:'opt opt-'+q.color+(answers[q.id]===o.val?' sel':''),onclick:()=>{answers[q.id]=o.val;render();}},h('span',{className:'opt-emoji'},o.emoji),h('span',{className:'opt-text'},o.text)));});
-      card.appendChild(optRow);content.appendChild(card);
+  // Update log modal
+  if (showUpdateLog) {
+    app.appendChild(h('div', {className: 'toast-overlay', onclick: dismissUpdateLog}));
+    const modal = h('div', {className: 'update-log-modal'});
+    modal.appendChild(h('div', {className: 'update-log-title'}, UPDATE_LOG.title));
+    const list = h('div', {className: 'update-log-list'});
+    UPDATE_LOG.items.forEach(item => {
+      list.appendChild(h('div', {className: 'update-log-item'}, item));
     });
-    const noteCard=h('div',{className:'note-card fade-in'});
-    noteCard.appendChild(h('div',{className:'q-label'},h('span',{className:'icon'},'✏️'),'备注',h('span',{className:'abstract'},'选填')));
-    const ta=h('textarea',{placeholder:'今天发生了什么值得一记的事？不写也完全没问题。',rows:'2',oninput:e=>{noteText=e.target.value;}});ta.value=noteText;
-    noteCard.appendChild(ta);content.appendChild(noteCard);
-    const allA=QUESTIONS.every(q=>answers[q.id]!==undefined);
-    content.appendChild(h('div',{className:'submit-wrap fade-in'},h('button',{className:'btn-submit '+(allA?'ready':'not-ready'),onclick:allA?submitCheckin:null},allA?'🏸 发球！记录今天':`还有 ${QUESTIONS.filter(q=>answers[q.id]===undefined).length} 项没选`)));
+    modal.appendChild(list);
+    modal.appendChild(h('button', {className: 'update-log-btn', onclick: dismissUpdateLog}, '知道了！'));
+    app.appendChild(modal);
+  }
+
+  // Weekly report modal
+  if (showWeeklyReport) {
+    app.appendChild(h('div', {className: 'toast-overlay', onclick: closeWeeklyReport}));
+    const modal = h('div', {className: 'weekly-modal'});
+    const { start, end } = getWeekRange();
+    modal.appendChild(h('div', {className: 'update-log-title'}, '📸 本周周报'));
+    const canvas = h('canvas', {id: 'weekly-canvas'});
+    modal.appendChild(canvas);
+    const btns = h('div', {className: 'weekly-btns'});
+    btns.appendChild(h('button', {className: 'weekly-btn weekly-btn-secondary', onclick: closeWeeklyReport}, '关闭'));
+    btns.appendChild(h('button', {className: 'weekly-btn weekly-btn-primary', onclick: shareWeeklyReport}, '📤 分享 / 下载'));
+    modal.appendChild(btns);
+    app.appendChild(modal);
+  }
+
+  // Reset animation flag after render
+  animateTransition = false;
+}
+
+function dismissToast() { toastData = null; render(); }
+
+function dismissUpdateLog() {
+  showUpdateLog = false;
+  try { localStorage.setItem('brainweather_seen_version', APP_VERSION); } catch(e) {}
+  render();
+}
+
+/* ===== Weekly report ===== */
+function getWeekRange() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const end = new Date(now);
+  end.setDate(end.getDate() - (day === 0 ? 0 : day));
+  const start = new Date(end);
+  start.setDate(start.getDate() - 6);
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return { start: fmt(start), end: fmt(end) };
+}
+
+function getWeekRecords() {
+  const { start, end } = getWeekRange();
+  return records.filter(r => r.date >= start && r.date <= end);
+}
+
+function isSunday() {
+  return new Date().getDay() === 0;
+}
+
+function shouldShowWeeklyReminder() {
+  if (!isSunday()) return false;
+  if (getWeekRecords().length < 1) return false;
+  const today = getToday();
+  try {
+    const dismissed = localStorage.getItem('brainweather_weekly_dismissed');
+    if (dismissed === today) return false;
+  } catch(e) {}
+  return true;
+}
+
+function dismissWeeklyReminder() {
+  showWeeklyReminder = false;
+  try { localStorage.setItem('brainweather_weekly_dismissed', getToday()); } catch(e) {}
+  render();
+}
+
+function openWeeklyReport() {
+  showWeeklyReminder = false;
+  showWeeklyReport = true;
+  render();
+  setTimeout(() => generateWeeklyCanvas(), 100);
+}
+
+function closeWeeklyReport() {
+  showWeeklyReport = false;
+  render();
+}
+
+function generateWeeklyCanvas() {
+  const canvas = document.getElementById('weekly-canvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 2;
+  const W = 750, H = 1200;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = '100%';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const weekRecs = getWeekRecords();
+  const { start, end } = getWeekRange();
+  const schoolRecs = weekRecs.filter(r => (r.mode || 'school') === 'school');
+  const restRecs = weekRecs.filter(r => r.mode === 'rest');
+
+  // Background
+  ctx.fillStyle = '#F5F0EB';
+  ctx.fillRect(0, 0, W, H);
+
+  // Top gradient bar
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, '#1A3BC2');
+  grad.addColorStop(0.5, '#E8553A');
+  grad.addColorStop(1, '#F2C94C');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, 6);
+
+  // Title
+  ctx.fillStyle = '#1A3BC2';
+  ctx.font = '700 36px "M PLUS Rounded 1c"';
+  ctx.textAlign = 'center';
+  ctx.fillText('🏸 脑子天气周报', W/2, 60);
+
+  // Date range
+  ctx.fillStyle = '#7A7268';
+  ctx.font = '400 18px "M PLUS Rounded 1c"';
+  ctx.fillText(`${start} ~ ${end}`, W/2, 90);
+
+  // Stats row
+  ctx.font = '500 16px "M PLUS Rounded 1c"';
+  ctx.fillText(`本周共记录 ${weekRecs.length} 天（上学日 ${schoolRecs.length} 天 / 休息日 ${restRecs.length} 天）`, W/2, 125);
+
+  // Divider
+  ctx.strokeStyle = '#E0D8CE';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(40, 145);
+  ctx.lineTo(W - 40, 145);
+  ctx.stroke();
+
+  let y = 175;
+
+  // Helper: draw a dimension summary
+  function drawDim(label, icon, vals, maxVal, color) {
+    if (vals.length === 0) return;
+    const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+    const sev = avg <= maxVal * 0.33 ? '轻微' : avg <= maxVal * 0.66 ? '中等' : '明显';
+    const hc = vals.filter(v => v >= Math.ceil(maxVal * 0.66)).length;
+    const hp = Math.round(hc / vals.length * 100);
+
+    // Background card
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(ctx, 30, y - 4, W - 60, 54, 12);
+    ctx.fill();
+    ctx.strokeStyle = '#EAE4DC';
+    ctx.lineWidth = 1;
+    roundRect(ctx, 30, y - 4, W - 60, 54, 12);
+    ctx.stroke();
+
+    // Icon + label
+    ctx.fillStyle = color;
+    ctx.font = '500 16px "M PLUS Rounded 1c"';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${icon} ${label}`, 50, y + 20);
+
+    // Severity
+    ctx.fillStyle = avg > maxVal * 0.66 ? '#E8553A' : avg > maxVal * 0.33 ? '#D4960A' : '#1A8A5C';
+    ctx.textAlign = 'right';
+    ctx.fillText(`平均：${sev}`, W - 50, y + 14);
+    ctx.fillStyle = '#7A7268';
+    ctx.font = '400 13px "M PLUS Rounded 1c"';
+    ctx.fillText(`${hp}% 中-重度`, W - 50, y + 36);
+
+    // Mini bar chart
+    const barW = 18, barGap = 4, barMaxH = 32;
+    const barStartX = W/2 - ((vals.length * (barW + barGap)) / 2);
+    vals.forEach((v, i) => {
+      const barH = Math.max(4, (v / maxVal) * barMaxH);
+      const bx = barStartX + i * (barW + barGap);
+      const by = y + 44 - barH;
+      ctx.fillStyle = v >= Math.ceil(maxVal * 0.66) ? '#E8553A' : v >= Math.ceil(maxVal * 0.33) ? '#F2C94C' : color;
+      roundRect(ctx, bx, by, barW, barH, 3);
+      ctx.fill();
+    });
+
+    y += 62;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  // Shared dimensions
+  const sharedIds = ['attention', 'emotion', 'sleep', 'body'];
+  const dimColors = {
+    attention:'#1A8A5C', initiation:'#E8553A', memory:'#6B5BAE', emotion:'#1A3BC2',
+    time:'#D4960A', body:'#C46A2A', sleep:'#7B4BAE', outing:'#1A7A7A',
+    exercise:'#1A8A5C', timeSpent:'#D4960A', boredom:'#C46A2A'
+  };
+
+  // Section: Shared
+  ctx.fillStyle = '#1A3BC2';
+  ctx.font = '700 20px "M PLUS Rounded 1c"';
+  ctx.textAlign = 'left';
+  ctx.fillText('📊 核心维度', 40, y);
+  y += 16;
+
+  sharedIds.forEach(dimId => {
+    const q = Q_SCHOOL.find(qq => qq.id === dimId);
+    if (!q) return;
+    const allVals = weekRecs.map(r => r.answers[dimId]).filter(v => v !== undefined);
+    const maxVal = q.options[q.options.length - 1].val;
+    drawDim(q.label, q.icon, allVals, maxVal, dimColors[dimId] || '#1A3BC2');
+  });
+
+  // Section: School-only
+  if (schoolRecs.length > 0) {
+    y += 8;
+    ctx.fillStyle = '#1A3BC2';
+    ctx.font = '700 20px "M PLUS Rounded 1c"';
+    ctx.textAlign = 'left';
+    ctx.fillText('🏫 上学日', 40, y);
+    y += 16;
+
+    ['initiation', 'memory', 'time'].forEach(dimId => {
+      const q = Q_SCHOOL.find(qq => qq.id === dimId);
+      if (!q) return;
+      const vals = schoolRecs.map(r => r.answers[dimId]).filter(v => v !== undefined);
+      if (vals.length === 0) return;
+      const maxVal = q.options[q.options.length - 1].val;
+      drawDim(q.label, q.icon, vals, maxVal, dimColors[dimId] || '#1A3BC2');
+    });
+  }
+
+  // Section: Rest-only
+  if (restRecs.length > 0) {
+    y += 8;
+    ctx.fillStyle = '#1A7A7A';
+    ctx.font = '700 20px "M PLUS Rounded 1c"';
+    ctx.textAlign = 'left';
+    ctx.fillText('🏖️ 休息日', 40, y);
+    y += 16;
+
+    ['outing', 'boredom', 'timeSpent'].forEach(dimId => {
+      const q = Q_REST.find(qq => qq.id === dimId);
+      if (!q) return;
+      const vals = restRecs.map(r => r.answers[dimId]).filter(v => v !== undefined);
+      if (vals.length === 0) return;
+      const maxVal = q.options[q.options.length - 1].val;
+      drawDim(q.label, q.icon, vals, maxVal, dimColors[dimId] || '#1A7A7A');
+    });
+  }
+
+  // Vent summary
+  const ventHigh = weekRecs.filter(r => r.answers.vent >= 2).length;
+  if (ventHigh > 0) {
+    y += 10;
+    ctx.fillStyle = '#C24B6E';
+    ctx.font = '500 15px "M PLUS Rounded 1c"';
+    ctx.textAlign = 'center';
+    ctx.fillText(`🔒 本周有 ${ventHigh} 天情绪压力较大`, W/2, y);
+    y += 10;
+  }
+
+  // Streak
+  const streak = getStreak();
+  if (streak > 0) {
+    y += 20;
+    ctx.fillStyle = '#E8553A';
+    ctx.font = '500 16px "M PLUS Rounded 1c"';
+    ctx.textAlign = 'center';
+    ctx.fillText(`🏸 当前连续打卡 ${streak} 天`, W/2, y);
+  }
+
+  // Footer
+  y = Math.max(y + 40, H - 60);
+  ctx.fillStyle = '#A89E94';
+  ctx.font = '400 13px "M PLUS Rounded 1c"';
+  ctx.textAlign = 'center';
+  ctx.fillText('脑子天气预报 · 姐姐给你做的', W/2, y);
+  ctx.fillText(`v${APP_VERSION}`, W/2, y + 20);
+
+  // Resize canvas height to actual content
+  const actualH = Math.min(y + 50, H);
+  const tmpData = ctx.getImageData(0, 0, W * dpr, actualH * dpr);
+  canvas.height = actualH * dpr;
+  ctx.putImageData(tmpData, 0, 0);
+}
+
+function downloadWeeklyReport() {
+  const canvas = document.getElementById('weekly-canvas');
+  if (!canvas) return;
+  const link = document.createElement('a');
+  const { start, end } = getWeekRange();
+  link.download = `脑子天气周报_${start}_${end}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function shareWeeklyReport() {
+  const canvas = document.getElementById('weekly-canvas');
+  if (!canvas) return;
+  canvas.toBlob(blob => {
+    if (navigator.share && navigator.canShare) {
+      const { start, end } = getWeekRange();
+      const file = new File([blob], `脑子天气周报_${start}_${end}.png`, { type: 'image/png' });
+      navigator.share({ files: [file], title: '脑子天气周报' }).catch(() => {
+        // Fallback to download
+        downloadWeeklyReport();
+      });
+    } else {
+      downloadWeeklyReport();
+    }
+  }, 'image/png');
+}
+
+/* ===== Checkin page ===== */
+function renderCheckin(app) {
+  const hdr = h('div', {className: anim('header')});
+  hdr.appendChild(h('div', {className: 'header-shuttle', innerHTML: SHUTTLE_SVG}));
+  hdr.appendChild(h('h1', null, '脑子天气预报'));
+  hdr.appendChild(h('div', {className: 'sub'}, '每天30秒，观察你的大脑在干什么'));
+  app.appendChild(hdr);
+
+  const q = getDayQuote();
+  app.appendChild(h('div', {className: anim('philo-card')},
+    h('div', {className: 'philo-text'}, q.text),
+    h('div', {className: 'philo-source'}, '—— ' + q.src)
+  ));
+
+  // Sunday weekly report reminder
+  if (showWeeklyReminder) {
+    const wr = getWeekRecords();
+    app.appendChild(h('div', {className: 'weekly-reminder', onclick: openWeeklyReport},
+      h('div', {className: 'weekly-reminder-icon'}, '📸'),
+      h('div', {className: 'weekly-reminder-text'},
+        h('div', {className: 'weekly-reminder-title'}, '本周结束啦！生成周报看看？'),
+        h('div', {className: 'weekly-reminder-sub'}, `这周记录了 ${wr.length} 天，可以分享给姐姐了`)
+      ),
+      h('div', {className: 'weekly-reminder-arrow'}, '→')
+    ));
+  }
+
+  const streak = getStreak();
+  app.appendChild(h('div', {className: anim('date-bar')},
+    h('div', {className: 'date-text'}, getToday() + ' ' + getWeekday(getToday())),
+    streak > 0 ? h('div', {className: 'streak-badge'}, `连续${streak}天`) : null
+  ));
+
+  const content = h('div', {className: 'content'});
+
+  if (todayDone()) {
+    const rec = getTodayRecord();
+    const mode = rec.mode || 'school';
+    const absDone = mode === 'rest' ? ABSTRACT_DONE_REST : ABSTRACT_DONE_SCHOOL;
+    const absMsg = absDone[Math.floor(Math.random() * absDone.length)];
+    const sm = streak <= 7 ? (STREAK_MSGS[streak] || `连续${streak}天了！`) : `连续${streak}天！你比大部分成年人都能坚持。`;
+    content.appendChild(h('div', {className: anim('done-card')},
+      h('div', {className: 'done-shuttle'}, '🏸'),
+      h('div', {className: 'done-title'}, '今天已经记录过啦'),
+      h('div', {className: 'done-sub'}, sm),
+      h('div', {className: 'done-abstract'}, absMsg)
+    ));
+  } else {
+    // Mode selector
+    const modeRow = h('div', {className: anim('mode-selector')});
+    modeRow.appendChild(h('button', {
+      className: 'mode-btn' + (currentMode === 'school' ? ' sel-school' : ''),
+      onclick: () => { currentMode = 'school'; answers = {}; ventText = ''; animateTransition = true; render(); }
+    }, '🏫 上学日'));
+    modeRow.appendChild(h('button', {
+      className: 'mode-btn' + (currentMode === 'rest' ? ' sel-rest' : ''),
+      onclick: () => { currentMode = 'rest'; answers = {}; ventText = ''; animateTransition = true; render(); }
+    }, '🏖️ 休息日'));
+    app.appendChild(modeRow);
+
+    if (!currentMode) {
+      content.appendChild(h('div', {className: 'empty-state'}, '先选一下今天是上学日还是休息日 ☝️'));
+    } else {
+      const questions = getQuestions();
+      questions.forEach((q, qi) => {
+        const isAnswered = answers[q.id] !== undefined;
+        const card = h('div', {className: anim('q-card') + (isAnswered ? ' answered' : ''), style: animateTransition ? {animationDelay: (qi * 0.04) + 's'} : {}});
+        card.appendChild(h('div', {className: 'q-label'},
+          h('span', {className: 'icon'}, q.icon),
+          q.label,
+          h('span', {className: 'abstract'}, q.abstract)
+        ));
+
+        const optRow = h('div', {className: 'options'});
+        q.options.forEach(o => {
+          optRow.appendChild(h('button', {
+            className: 'opt opt-' + q.color + (answers[q.id] === o.val ? ' sel' : ''),
+            onclick: () => { answers[q.id] = o.val; render(); }
+          },
+            h('span', {className: 'opt-emoji'}, o.emoji),
+            h('span', {className: 'opt-text'}, o.text)
+          ));
+        });
+        card.appendChild(optRow);
+
+        // Vent text box
+        if (q.isVent && answers[q.id] >= 2) {
+          const vbox = h('div', {className: 'vent-box'});
+          const ta = h('textarea', {
+            placeholder: '这里只有你自己能看到，随便骂 🔒',
+            rows: '3',
+            oninput: e => { ventText = e.target.value; }
+          });
+          ta.value = ventText;
+          vbox.appendChild(ta);
+          vbox.appendChild(h('div', {className: 'vent-privacy'}, '🔐 不会出现在报告里，只有你能看到'));
+          card.appendChild(vbox);
+        }
+
+        // Exercise sub-question
+        if (q.hasSubQ && answers[q.id] >= q.subQ.showWhen) {
+          const subDiv = h('div', {className: 'sub-question'});
+          subDiv.appendChild(h('div', {className: 'sub-label'}, '运动后大脑感觉怎样？'));
+          const subOpts = h('div', {className: 'options'});
+          q.subQ.options.forEach(o => {
+            subOpts.appendChild(h('button', {
+              className: 'opt opt-' + q.color + (answers[q.subQ.id] === o.val ? ' sel' : ''),
+              onclick: () => { answers[q.subQ.id] = o.val; render(); }
+            },
+              h('span', {className: 'opt-emoji'}, o.emoji),
+              h('span', {className: 'opt-text'}, o.text)
+            ));
+          });
+          subDiv.appendChild(subOpts);
+          card.appendChild(subDiv);
+        }
+
+        content.appendChild(card);
+      });
+
+      // Note card
+      const noteCard = h('div', {className: anim('note-card')});
+      noteCard.appendChild(h('div', {className: 'q-label'},
+        h('span', {className: 'icon'}, '✏️'), '备注',
+        h('span', {className: 'abstract'}, '选填')
+      ));
+      const ta = h('textarea', {
+        placeholder: '今天发生了什么值得一记的事？不写也完全没问题。',
+        rows: '2',
+        oninput: e => { noteText = e.target.value; }
+      });
+      ta.value = noteText;
+      noteCard.appendChild(ta);
+      content.appendChild(noteCard);
+
+      // Submit button
+      const questions2 = getQuestions();
+      const requiredIds = [];
+      questions2.forEach(q => {
+        requiredIds.push(q.id);
+        if (q.hasSubQ && answers[q.id] >= q.subQ.showWhen) {
+          requiredIds.push(q.subQ.id);
+        }
+      });
+      const allAnswered = requiredIds.every(id => answers[id] !== undefined);
+      const remaining = requiredIds.filter(id => answers[id] === undefined).length;
+
+      content.appendChild(h('div', {className: anim('submit-wrap')},
+        h('button', {
+          className: 'btn-submit ' + (allAnswered ? 'ready' : 'not-ready'),
+          onclick: allAnswered ? submitCheckin : null
+        }, allAnswered ? '🏸 发球！记录今天' : `还有 ${remaining} 项没选`)
+      ));
+    }
   }
   app.appendChild(content);
 }
 
-function submitCheckin(){
-  records.push({id:uid(),date:getToday(),ts:Date.now(),answers:{...answers},note:noteText.trim()||''});
+/* ===== Submit ===== */
+function submitCheckin() {
+  const record = {
+    id: uid(),
+    date: getToday(),
+    ts: Date.now(),
+    mode: currentMode,
+    answers: {...answers},
+    note: noteText.trim() || '',
+  };
+  // Store vent text separately (never exported)
+  if (ventText.trim()) {
+    record.ventText = ventText.trim();
+  }
+  records.push(record);
   saveData();
-  toastData={icon:'🏸',text:'记录成功！',sub:ABSTRACT_DONE[Math.floor(Math.random()*ABSTRACT_DONE.length)]};
-  answers={};noteText='';render();setTimeout(dismissToast,2500);
+
+  // Pick completion message
+  let sub;
+  const absDone = currentMode === 'rest' ? ABSTRACT_DONE_REST : ABSTRACT_DONE_SCHOOL;
+  sub = absDone[Math.floor(Math.random() * absDone.length)];
+
+  // Exercise easter egg
+  if (currentMode === 'rest' && answers.exercise >= 1 && answers.exerciseFeel !== undefined && answers.exerciseFeel <= 2) {
+    sub = EXERCISE_EASTER_EGGS[Math.floor(Math.random() * EXERCISE_EASTER_EGGS.length)];
+  }
+
+  toastData = { icon: '🏸', text: '记录成功！', sub: sub };
+  answers = {};
+  noteText = '';
+  ventText = '';
+  currentMode = null;
+  render();
+  setTimeout(dismissToast, 2500);
 }
 
-function renderHistory(app){
-  app.appendChild(h('div',{className:'header fade-in'},h('div',{className:'header-shuttle',innerHTML:SHUTTLE_SVG}),h('h1',null,'历史记录'),h('div',{className:'sub'},'你的大脑气象档案')));
-  const content=h('div',{className:'content'});
-  if(records.length===0){content.appendChild(h('div',{className:'empty-state'},'还没有记录\n你的大脑气象站尚未开始运营\n先去打一次卡吧 🏸'));}
-  else{[...records].reverse().forEach(r=>{
-    const item=h('div',{className:'history-item fade-in'});
-    item.appendChild(h('div',{className:'history-date'},r.date+' '+getWeekday(r.date)));
-    const chips=h('div',{className:'history-chips'});
-    QUESTIONS.forEach(q=>{const val=r.answers[q.id];if(val===undefined)return;const opt=q.options.find(o=>o.val===val);if(!opt)return;const sev=val>=(q.options.length>3?3:2)?'warn':val>=(q.options.length>3?2:1)?'mid':'';chips.appendChild(h('span',{className:'history-chip'+(sev?' '+sev:'')},opt.emoji+' '+q.label.slice(0,4)));});
-    item.appendChild(chips);
-    if(r.note)item.appendChild(h('div',{className:'history-note'},r.note));
-    content.appendChild(item);
-  });}
+/* ===== History page ===== */
+function renderHistory(app) {
+  app.appendChild(h('div', {className: anim('header')},
+    h('div', {className: 'header-shuttle', innerHTML: SHUTTLE_SVG}),
+    h('h1', null, '历史记录'),
+    h('div', {className: 'sub'}, '你的大脑气象档案')
+  ));
+
+  // Filter tabs
+  const filterRow = h('div', {className: anim('history-filter')});
+  [{id:'all',label:'全部'},{id:'school',label:'🏫 上学日'},{id:'rest',label:'🏖️ 休息日'}].forEach(f => {
+    filterRow.appendChild(h('button', {
+      className: 'filter-btn' + (historyFilter === f.id ? ' active' : ''),
+      onclick: () => { historyFilter = f.id; render(); }
+    }, f.label));
+  });
+  app.appendChild(filterRow);
+
+  const content = h('div', {className: 'content'});
+  let filtered = [...records];
+  if (historyFilter !== 'all') {
+    filtered = filtered.filter(r => (r.mode || 'school') === historyFilter);
+  }
+
+  if (filtered.length === 0) {
+    content.appendChild(h('div', {className: 'empty-state'}, '还没有记录\n你的大脑气象站尚未开始运营\n先去打一次卡吧 🏸'));
+  } else {
+    [...filtered].reverse().forEach(r => {
+      const item = h('div', {className: anim('history-item')});
+      const mode = r.mode || 'school';
+      const modeLabel = mode === 'school' ? '上学日' : '休息日';
+      item.appendChild(h('div', {className: 'history-date'},
+        r.date + ' ' + getWeekday(r.date),
+        h('span', {className: 'history-mode ' + mode}, modeLabel)
+      ));
+
+      const chips = h('div', {className: 'history-chips'});
+      const qs = mode === 'rest' ? Q_REST : Q_SCHOOL;
+      qs.forEach(q => {
+        if (q.id === 'vent') return; // Don't show vent in chips
+        const val = r.answers[q.id];
+        if (val === undefined) return;
+        const opt = q.options.find(o => o.val === val);
+        if (!opt) return;
+        const maxVal = q.options[q.options.length - 1].val;
+        const sev = val >= maxVal * 0.75 ? 'warn' : val >= maxVal * 0.5 ? 'mid' : '';
+        chips.appendChild(h('span', {className: 'history-chip' + (sev ? ' ' + sev : '')},
+          opt.emoji + ' ' + q.label.slice(0, 4)
+        ));
+      });
+      item.appendChild(chips);
+
+      // Show exercise feel if present
+      if (mode === 'rest' && r.answers.exerciseFeel !== undefined) {
+        const exQ = Q_REST.find(q => q.id === 'exercise');
+        if (exQ && exQ.subQ) {
+          const feelOpt = exQ.subQ.options.find(o => o.val === r.answers.exerciseFeel);
+          if (feelOpt) {
+            chips.appendChild(h('span', {className: 'history-chip'}, feelOpt.emoji + ' 运动后'));
+          }
+        }
+      }
+
+      if (r.note) item.appendChild(h('div', {className: 'history-note'}, r.note));
+
+      // Vent indicator (level only, no text)
+      if (r.answers.vent >= 2) {
+        item.appendChild(h('div', {className: 'history-vent-indicator'}, '🔒 有吐槽记录'));
+      }
+
+      content.appendChild(item);
+    });
+  }
   app.appendChild(content);
 }
 
-function renderReport(app){
-  app.appendChild(h('div',{className:'header fade-in'},h('div',{className:'header-shuttle',innerHTML:SHUTTLE_SVG}),h('h1',null,'看诊报告'),h('div',{className:'sub'},'自动生成，给医生看的')));
-  const content=h('div',{className:'content'});
-  if(records.length<3){content.appendChild(h('div',{className:'empty-state'},`至少记录3天才能生成报告\n目前已记录 ${records.length} 天 🏸`));app.appendChild(content);return;}
-  const last7=records.slice(-7),totalDays=records.length;
-  const dimColors={attention:'#1A8A5C',initiation:'#E8553A',memory:'#6B5BAE',emotion:'#1A3BC2',time:'#D4960A',body:'#C46A2A',sleep:'#7B4BAE',mood:'#1A3BC2'};
-  const dimLabels={attention:'注意力',initiation:'启动力',memory:'记忆',emotion:'情绪',time:'时间感',body:'身体',sleep:'睡眠',mood:'心情'};
-  let docText=`观察周期：${records[0].date} 至 ${records[records.length-1].date}（共${totalDays}天）\n\n`;
-  QUESTIONS.forEach((q,qi)=>{
-    if(qi===4){
-      const nd=h('div',{className:'net-divider'});
-      nd.appendChild(h('span',{className:'net-label'},'—— 中场休息 ——'));
-      content.appendChild(nd);
+/* ===== Vent diary (private) ===== */
+function renderVentDiary(app) {
+  app.appendChild(h('div', {className: anim('header')},
+    h('div', {className: 'header-shuttle', innerHTML: SHUTTLE_SVG}),
+    h('h1', null, '树洞日记'),
+    h('div', {className: 'sub'}, '🔒 只有你自己能看到')
+  ));
+
+  const content = h('div', {className: 'content'});
+  const ventRecords = records.filter(r => r.ventText || r.answers.vent >= 1);
+
+  if (ventRecords.length === 0) {
+    content.appendChild(h('div', {className: 'empty-state'}, '还没有吐槽记录\n\n希望你每天都天下太平 😇\n但如果不太平，这里永远接着'));
+  } else {
+    const VENT_LABELS = ['天下太平','有点不爽但忍住了','很想骂人','不骂会爆炸'];
+    [...ventRecords].reverse().forEach(r => {
+      const item = h('div', {className: anim('vent-history-item')});
+      const mode = r.mode || 'school';
+      const modeLabel = mode === 'school' ? '🏫' : '🏖️';
+      item.appendChild(h('div', {className: 'vent-history-date'},
+        modeLabel + ' ' + r.date + ' ' + getWeekday(r.date)
+      ));
+      const ventVal = r.answers.vent;
+      if (ventVal !== undefined) {
+        const ventOpt = Q_SCHOOL.find(q => q.id === 'vent').options.find(o => o.val === ventVal);
+        if (ventOpt) {
+          item.appendChild(h('div', {className: 'vent-history-level'}, ventOpt.emoji + ' ' + VENT_LABELS[ventVal]));
+        }
+      }
+      if (r.ventText) {
+        item.appendChild(h('div', {className: 'vent-history-text'}, r.ventText));
+      }
+      content.appendChild(item);
+    });
+  }
+  app.appendChild(content);
+}
+
+/* ===== Report page ===== */
+function renderReport(app) {
+  app.appendChild(h('div', {className: anim('header')},
+    h('div', {className: 'header-shuttle', innerHTML: SHUTTLE_SVG}),
+    h('h1', null, '看诊报告'),
+    h('div', {className: 'sub'}, '自动生成，给医生看的')
+  ));
+
+  const content = h('div', {className: 'content'});
+
+  if (records.length < 3) {
+    content.appendChild(h('div', {className: 'empty-state'},
+      `至少记录3天才能生成报告\n目前已记录 ${records.length} 天 🏸`
+    ));
+    app.appendChild(content);
+    return;
+  }
+
+  const schoolRecs = records.filter(r => (r.mode || 'school') === 'school');
+  const restRecs = records.filter(r => r.mode === 'rest');
+  const totalDays = records.length;
+
+  const dimColors = {
+    attention:'#1A8A5C', initiation:'#E8553A', memory:'#6B5BAE', emotion:'#1A3BC2',
+    time:'#D4960A', body:'#C46A2A', sleep:'#7B4BAE', outing:'#1A7A7A',
+    exercise:'#1A8A5C', timeSpent:'#D4960A', boredom:'#C46A2A', vent:'#C24B6E'
+  };
+
+  let docText = `脑子天气预报 — 观察报告\n`;
+  docText += `观察周期：${records[0].date} 至 ${records[records.length-1].date}（共${totalDays}天，上学日${schoolRecs.length}天，休息日${restRecs.length}天）\n\n`;
+
+  // Shared dimensions comparison
+  const sharedIds = ['attention', 'emotion', 'sleep', 'body'];
+  content.appendChild(h('div', {className: anim('report-section-header')},
+    h('span', {className: 'section-icon'}, '📊'), '重叠维度对比（上学日 vs 休息日）'
+  ));
+
+  sharedIds.forEach(dimId => {
+    const qSchool = Q_SCHOOL.find(q => q.id === dimId);
+    const qRest = Q_REST.find(q => q.id === dimId);
+    if (!qSchool) return;
+    const maxVal = qSchool.options[qSchool.options.length - 1].val;
+
+    const sec = h('div', {className: anim('report-dim-card')});
+    sec.appendChild(h('div', {className: 'report-dim-label'}, h('span', null, qSchool.icon), qSchool.label));
+
+    // School stats
+    const sVals = schoolRecs.map(r => r.answers[dimId]).filter(v => v !== undefined);
+    const rVals = restRecs.map(r => r.answers[dimId]).filter(v => v !== undefined);
+
+    let statText = '';
+    if (sVals.length > 0) {
+      const sAvg = sVals.reduce((a,b) => a+b, 0) / sVals.length;
+      const sHc = sVals.filter(v => v >= Math.ceil(maxVal * 0.66)).length;
+      const sHp = Math.round(sHc / sVals.length * 100);
+      const sSev = sAvg <= maxVal * 0.33 ? '轻微' : sAvg <= maxVal * 0.66 ? '中等' : '明显';
+      statText += `🏫 上学日（${schoolRecs.length}天）：${sHp}%中-重度，平均${sSev}`;
+      docText += `【${qSchool.label}】上学日${schoolRecs.length}天中${sHp}%中-重度，平均${sSev}`;
     }
-    const sec=h('div',{className:'report-dim-card fade-in'});
-    sec.appendChild(h('div',{className:'report-dim-label'},h('span',null,q.icon),q.label));
-    const bars=h('div',{className:'report-bars'}),labels=h('div',{className:'report-bar-labels'}),maxVal=q.options.length-1;
-    last7.forEach(r=>{const val=r.answers[q.id];const pct=val!==undefined?((val/maxVal)*100):0;bars.appendChild(h('div',{className:'report-bar',style:{height:Math.max(4,pct*0.4)+'px',background:val!==undefined?dimColors[q.id]:'var(--border)'}}));labels.appendChild(h('div',{className:'report-bar-label'},r.date.slice(5)));});
-    sec.appendChild(bars);sec.appendChild(labels);
-    const allVals=records.map(r=>r.answers[q.id]).filter(v=>v!==undefined);
-    if(allVals.length>0){const avg=allVals.reduce((a,b)=>a+b,0)/allVals.length;const hc=allVals.filter(v=>v>=Math.ceil(maxVal*0.66)).length;const hp=Math.round(hc/allVals.length*100);const sl=avg<=maxVal*0.33?'轻微':avg<=maxVal*0.66?'中等':'明显';sec.appendChild(h('div',{className:'report-summary'},`${totalDays}天中，${hp}%的天数表现为中-重度。平均严重程度：${sl}。`));docText+=`【${q.label}】${totalDays}天中${hp}%表现为中-重度，平均程度${sl}\n`;}
+    if (rVals.length > 0) {
+      const rAvg = rVals.reduce((a,b) => a+b, 0) / rVals.length;
+      const rHc = rVals.filter(v => v >= Math.ceil(maxVal * 0.66)).length;
+      const rHp = Math.round(rHc / rVals.length * 100);
+      const rSev = rAvg <= maxVal * 0.33 ? '轻微' : rAvg <= maxVal * 0.66 ? '中等' : '明显';
+      if (statText) statText += '\n';
+      statText += `🏖️ 休息日（${restRecs.length}天）：${rHp}%中-重度，平均${rSev}`;
+      docText += `；休息日${restRecs.length}天中${rHp}%中-重度，平均${rSev}`;
+    }
+    docText += '\n';
+
+    if (statText) {
+      sec.appendChild(h('div', {className: 'report-summary'}, statText));
+    }
     content.appendChild(sec);
   });
-  const notes=records.filter(r=>r.note).map(r=>`${r.date}: ${r.note}`);
-  if(notes.length>0)docText+='\n【自由备注摘录】\n'+notes.slice(-5).join('\n');
-  const netDiv2=h('div',{className:'net-divider'});
-  netDiv2.appendChild(h('span',{className:'net-label'},'—— 可导出区域 ——'));
-  content.appendChild(netDiv2);
-  const dc=h('div',{className:'report-for-doc fade-in'});
-  dc.appendChild(h('div',{className:'report-for-doc-title'},'📋 可复制给医生的文字版'));
-  dc.appendChild(h('div',{className:'report-for-doc-text'},docText));
-  dc.appendChild(h('button',{className:'btn-copy',onclick:()=>{navigator.clipboard.writeText(docText).then(()=>{toastData={icon:'✅',text:'已复制到剪贴板',sub:'可以直接发给姐姐或给医生看'};render();setTimeout(dismissToast,1800);}).catch(()=>{const range=document.createRange();range.selectNodeContents(dc.querySelector('.report-for-doc-text'));window.getSelection().removeAllRanges();window.getSelection().addRange(range);});}},'复制报告文字'));
-  content.appendChild(dc);app.appendChild(content);
-}
 
-function renderSettings(app){
-  app.appendChild(h('div',{className:'header fade-in'},h('div',{className:'header-shuttle',innerHTML:SHUTTLE_SVG}),h('h1',null,'设置')));
-  const content=h('div',{className:'content'});
-  content.appendChild(h('div',{className:'setting-row fade-in'},h('div',{className:'setting-label'},`已记录 ${records.length} 天`)));
-  content.appendChild(h('div',{className:'setting-row fade-in'},h('div',{className:'setting-label'},'导出数据（JSON）'),h('button',{className:'setting-action setting-export',onclick:()=>{const blob=new Blob([JSON.stringify(records,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brain-weather-data.json';a.click();}},'导出')));
-  content.appendChild(h('div',{className:'setting-row fade-in'},h('div',{className:'setting-label'},'清除所有数据'),h('button',{className:'setting-action setting-danger',onclick:()=>{if(confirm('确定要清除所有记录吗？这个操作不能撤销。')){records=[];saveData();toastData={icon:'🗑️',text:'已清除',sub:''};render();setTimeout(dismissToast,1500);}}},'清除')));
-  const inst=h('div',{className:'instruction-card fade-in'});
-  inst.appendChild(h('div',{className:'instruction-title'},'📱 添加到主屏幕'));
-  inst.appendChild(h('div',{className:'instruction-steps',innerHTML:'Safari打开这个页面 →<br>点底部中间的 <b>分享按钮</b>（方框+箭头那个）→<br>往下滑找到 <b>"添加到主屏幕"</b> →<br>点"添加"<br><br>之后桌面上就会出现一个图标，打开跟app一样 ✨'}));
-  content.appendChild(inst);
-  content.appendChild(h('div',{className:'empty-state',style:{marginTop:'32px'}},'🏸 脑子天气预报\n姐姐给你做的\n\n你的大脑值得被好好观察\n它虽然经常掉线 但一直在努力'));
+  // School-only dimensions
+  if (schoolRecs.length > 0) {
+    const nd1 = h('div', {className: 'net-divider'});
+    nd1.appendChild(h('span', {className: 'net-label'}, '—— 中场休息 ——'));
+    content.appendChild(nd1);
+
+    content.appendChild(h('div', {className: anim('report-section-header')},
+      h('span', {className: 'section-icon'}, '🏫'), '上学日专属维度'
+    ));
+
+    docText += '\n--- 上学日专属 ---\n';
+    ['initiation', 'memory', 'time'].forEach(dimId => {
+      const q = Q_SCHOOL.find(qq => qq.id === dimId);
+      if (!q) return;
+      const maxVal = q.options[q.options.length - 1].val;
+      const vals = schoolRecs.map(r => r.answers[dimId]).filter(v => v !== undefined);
+      if (vals.length === 0) return;
+
+      const sec = h('div', {className: anim('report-dim-card')});
+      sec.appendChild(h('div', {className: 'report-dim-label'}, h('span', null, q.icon), q.label));
+
+      const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+      const hc = vals.filter(v => v >= Math.ceil(maxVal * 0.66)).length;
+      const hp = Math.round(hc / vals.length * 100);
+      const sev = avg <= maxVal * 0.33 ? '轻微' : avg <= maxVal * 0.66 ? '中等' : '明显';
+
+      sec.appendChild(h('div', {className: 'report-summary'},
+        `${schoolRecs.length}天中${hp}%中-重度，平均${sev}`
+      ));
+      docText += `【${q.label}】${schoolRecs.length}天中${hp}%中-重度，平均${sev}\n`;
+      content.appendChild(sec);
+    });
+  }
+
+  // Rest-only dimensions
+  if (restRecs.length > 0) {
+    const nd2 = h('div', {className: 'net-divider'});
+    nd2.appendChild(h('span', {className: 'net-label'}, '—— 中场休息 ——'));
+    content.appendChild(nd2);
+
+    content.appendChild(h('div', {className: anim('report-section-header')},
+      h('span', {className: 'section-icon'}, '🏖️'), '休息日专属维度'
+    ));
+
+    docText += '\n--- 休息日专属 ---\n';
+    ['outing', 'exercise', 'timeSpent', 'boredom'].forEach(dimId => {
+      const q = Q_REST.find(qq => qq.id === dimId);
+      if (!q) return;
+      const vals = restRecs.map(r => r.answers[dimId]).filter(v => v !== undefined);
+      if (vals.length === 0) return;
+
+      const sec = h('div', {className: anim('report-dim-card')});
+      sec.appendChild(h('div', {className: 'report-dim-label'}, h('span', null, q.icon), q.label));
+
+      if (dimId === 'outing') {
+        // Distribution for outing
+        const counts = [0,0,0,0];
+        vals.forEach(v => { if (counts[v] !== undefined) counts[v]++; });
+        const labels = ['宅家','短暂外出','大半天外出','全天外出'];
+        let txt = labels.map((l, i) => `${l}${counts[i]}天`).join('，');
+        sec.appendChild(h('div', {className: 'report-summary'}, txt));
+        docText += `【出门情况】${txt}\n`;
+      } else if (dimId === 'exercise') {
+        // Exercise type distribution
+        const counts = [0,0,0,0];
+        vals.forEach(v => { if (counts[v] !== undefined) counts[v]++; });
+        const labels = ['没运动','走路','其他运动','羽毛球'];
+        let txt = labels.map((l, i) => `${l}${counts[i]}天`).join('，');
+        // Exercise feel summary
+        const feelVals = restRecs.map(r => r.answers.exerciseFeel).filter(v => v !== undefined);
+        if (feelVals.length > 0) {
+          const positive = feelVals.filter(v => v <= 2).length;
+          txt += `\n运动后感受：${positive}/${feelVals.length}次为正面反馈`;
+        }
+        sec.appendChild(h('div', {className: 'report-summary'}, txt));
+        docText += `【运动情况】${txt}\n`;
+      } else {
+        const maxVal = q.options[q.options.length - 1].val;
+        const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+        const hc = vals.filter(v => v >= Math.ceil(maxVal * 0.66)).length;
+        const hp = Math.round(hc / vals.length * 100);
+        const sev = avg <= maxVal * 0.33 ? '轻微' : avg <= maxVal * 0.66 ? '中等' : '明显';
+        sec.appendChild(h('div', {className: 'report-summary'},
+          `${restRecs.length}天中${hp}%中-重度，平均${sev}`
+        ));
+        docText += `【${q.label}】${restRecs.length}天中${hp}%中-重度，平均${sev}\n`;
+      }
+      content.appendChild(sec);
+    });
+  }
+
+  // Vent frequency (no text)
+  const ventSchool = schoolRecs.filter(r => r.answers.vent >= 2).length;
+  const ventRest = restRecs.filter(r => r.answers.vent >= 2).length;
+  if (ventSchool + ventRest > 0) {
+    docText += `\n【情绪压力信号】过去${totalDays}天中${ventSchool + ventRest}天有明显不满情绪（上学日${ventSchool}天/休息日${ventRest}天）\n`;
+  }
+
+  // Notes
+  const notes = records.filter(r => r.note).map(r => `${r.date}(${(r.mode||'school')==='school'?'上学':'休息'}): ${r.note}`);
+  if (notes.length > 0) {
+    docText += '\n【自由备注摘录】\n' + notes.slice(-5).join('\n');
+  }
+
+  // Exportable text
+  const nd3 = h('div', {className: 'net-divider'});
+  nd3.appendChild(h('span', {className: 'net-label'}, '—— 可导出区域 ——'));
+  content.appendChild(nd3);
+
+  const dc = h('div', {className: anim('report-for-doc')});
+  dc.appendChild(h('div', {className: 'report-for-doc-title'}, '📋 可复制给医生的文字版'));
+  dc.appendChild(h('div', {className: 'report-for-doc-text'}, docText));
+  dc.appendChild(h('button', {className: 'btn-copy', onclick: () => {
+    navigator.clipboard.writeText(docText).then(() => {
+      toastData = {icon: '✅', text: '已复制到剪贴板', sub: '可以直接发给姐姐或给医生看'};
+      render();
+      setTimeout(dismissToast, 1800);
+    }).catch(() => {
+      const range = document.createRange();
+      range.selectNodeContents(dc.querySelector('.report-for-doc-text'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    });
+  }}, '复制报告文字'));
+
+  // Weekly report image button
+  if (getWeekRecords().length >= 1) {
+    dc.appendChild(h('button', {className: 'btn-copy', style: {marginTop: '8px', background: 'var(--acc-teal)'}, onclick: openWeeklyReport}, '📸 生成本周周报图片'));
+  }
+
+  content.appendChild(dc);
   app.appendChild(content);
 }
 
-loadData();render();
+/* ===== Settings page ===== */
+function renderSettings(app) {
+  app.appendChild(h('div', {className: anim('header')},
+    h('div', {className: 'header-shuttle', innerHTML: SHUTTLE_SVG}),
+    h('h1', null, '设置')
+  ));
+
+  const content = h('div', {className: 'content'});
+  const schoolCount = records.filter(r => (r.mode || 'school') === 'school').length;
+  const restCount = records.filter(r => r.mode === 'rest').length;
+
+  content.appendChild(h('div', {className: anim('setting-row')},
+    h('div', {className: 'setting-label'}, `已记录 ${records.length} 天（上学${schoolCount} / 休息${restCount}）`)
+  ));
+
+  content.appendChild(h('div', {className: anim('setting-row')},
+    h('div', {className: 'setting-label'}, '导出数据（JSON）'),
+    h('button', {className: 'setting-action setting-export', onclick: () => {
+      // Export without ventText
+      const exportData = records.map(r => {
+        const copy = {...r};
+        delete copy.ventText;
+        return copy;
+      });
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'brain-weather-data.json';
+      a.click();
+    }}, '导出')
+  ));
+
+  content.appendChild(h('div', {className: anim('setting-row')},
+    h('div', {className: 'setting-label'}, '导入数据'),
+    h('button', {className: 'setting-action setting-export', onclick: () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const imported = JSON.parse(ev.target.result);
+            if (!Array.isArray(imported)) throw new Error('not array');
+            // Merge by id, don't overwrite existing
+            const existingIds = new Set(records.map(r => r.id));
+            let added = 0;
+            imported.forEach(r => {
+              if (!r.id) r.id = uid();
+              if (!r.mode) r.mode = 'school'; // legacy
+              if (!existingIds.has(r.id)) {
+                records.push(r);
+                added++;
+              }
+            });
+            records.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+            saveData();
+            toastData = {icon: '✅', text: `导入成功`, sub: `新增 ${added} 条记录`};
+            render();
+            setTimeout(dismissToast, 1800);
+          } catch(err) {
+            toastData = {icon: '❌', text: '导入失败', sub: '文件格式不对'};
+            render();
+            setTimeout(dismissToast, 1800);
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }}, '导入')
+  ));
+
+  content.appendChild(h('div', {className: anim('setting-row')},
+    h('div', {className: 'setting-label'}, '清除所有数据'),
+    h('button', {className: 'setting-action setting-danger', onclick: () => {
+      if (confirm('确定要清除所有记录吗？这个操作不能撤销。')) {
+        records = [];
+        saveData();
+        toastData = {icon: '🗑️', text: '已清除', sub: ''};
+        render();
+        setTimeout(dismissToast, 1500);
+      }
+    }}, '清除')
+  ));
+
+  const inst = h('div', {className: anim('instruction-card')});
+  inst.appendChild(h('div', {className: 'instruction-title'}, '📱 添加到主屏幕'));
+  inst.appendChild(h('div', {className: 'instruction-steps', innerHTML:
+    'Safari打开这个页面 →<br>' +
+    '点底部中间的 <b>分享按钮</b>（方框+箭头那个）→<br>' +
+    '往下滑找到 <b>"添加到主屏幕"</b> →<br>' +
+    '点"添加"<br><br>' +
+    '之后桌面上就会出现一个图标，打开跟app一样 ✨'
+  }));
+  content.appendChild(inst);
+
+  content.appendChild(h('div', {className: 'empty-state', style: {marginTop: '32px'}},
+    '🏸 脑子天气预报 v' + APP_VERSION +
+    '\n姐姐给你做的\n\n你的大脑值得被好好观察\n它虽然经常掉线 但一直在努力'
+  ));
+
+  app.appendChild(content);
+}
+
+/* ===== Init ===== */
+loadData();
+
+// Check if we need to show update log
+try {
+  const seenVersion = localStorage.getItem('brainweather_seen_version');
+  if (seenVersion !== APP_VERSION) {
+    showUpdateLog = true;
+  }
+} catch(e) {}
+
+// Check for Sunday weekly report reminder
+showWeeklyReminder = shouldShowWeeklyReminder();
+
+render();
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js?v=2.1.1').catch(() => {});
+}
 
 })();
 </script>
